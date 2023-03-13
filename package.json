@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "express": "^4.18.2",
+    "hbs": "^4.2.0",
+    "mysql2": "^3.2.0",
+    "passport": "^0.6.0",
+    "sequelize": "^6.29.3"
+  }
+}
