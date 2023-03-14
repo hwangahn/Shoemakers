@@ -11,10 +11,10 @@ router.get('/register', (req, res) => {
     res.status(200).render("register");
 });
 
+router.get('/logout', logoutRequest);
+
 router.post('/login', loginRequest);
 
 router.post('/register', registerRequest);
-
-router.get('/logout', logoutRequest);
 
 module.exports = router;

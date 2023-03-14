@@ -5,7 +5,6 @@ const path = require('path');
 const verify = require('./passport/localStrategy');
 const LocalStrategy = require('passport-local');
 const hbs = require('hbs');
-const { sessionStore } = require('./models/sessions');
 
 hbs.registerPartials(path.join(__dirname, '/views/partials'));
 
@@ -21,7 +20,6 @@ app.use(session({
     secret: "oh so secret",
     resave: false,
     saveUninitialized: true,
-    store: sessionStore
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -33,7 +31,7 @@ app.use('/', require('./routers/goodsRouter'));
 
 app.get('/', (req, res) => {
     console.log(req.isAuthenticated());
-    res.render('home', {authenticated: req.isAuthenticated()});
+    res.status(200).render('home', {authenticated: req.isAuthenticated()});
 });
 
 app.listen(port, () => {

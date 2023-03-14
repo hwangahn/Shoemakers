@@ -23,7 +23,7 @@ let registerRequest = (req, res) => {
     // console.log(req.body.passwordRetype);
 
     if (req.body.password != req.body.passwordRetype) {
-        res.render('register', {warning: "Password don't match password retyped"});
+        res.status(200).render('register', {warning: "Password don't match password retyped"});
     } 
     user.findAll({
         where: {
@@ -40,7 +40,7 @@ let registerRequest = (req, res) => {
         });
 
         if (count) {
-            res.render('register', {warning: "Username already exist. Choose another"});
+            res.status(300).render('register', {warning: "Username already exist. Choose another"});
         } else {
             user.create({
                 username: req.body.username,
@@ -48,7 +48,7 @@ let registerRequest = (req, res) => {
                                 .update('very secure trust me')
                                 .digest('hex'),
             });
-            res.redirect('/login');
+            res.status(200).redirect('/login');
         }
     })
     .catch(err => {
@@ -60,10 +60,11 @@ let registerRequest = (req, res) => {
 let logoutRequest = (req, res, next) => {
 
     req.logOut((err) => {
+        res.status(500);
         return next(err);
     });
 
-    res.redirect('/');
+    res.status(200).redirect('/');
 
 }
 
