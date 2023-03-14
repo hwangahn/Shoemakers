@@ -1,0 +1,31 @@
+    <div id="category">
+
+        <a id="man" href="/category/man">Man</a>
+        <a id="woman" href="/category/woman">Woman</a>
+        <a id="kid" href="/category/kid">Kid</a>
+
+    </div>
+
+    <div id="search">
+
+        <form action="/search" method="post">
+            <input type="text" name="name" id="name" rows="1" cols="60" required style="width: 500px; height: 20px;">
+            <input type="submit" value = "Submit">
+        </form>
+
+    </div>
+
+    <div id="utils">
+
+        {{#if authenticated}}
+
+            <a href="/logout">Log out</a>
+            <a href="/cart">Cart</a>
+
+        {{else}} 
+
+            <a href="/login">Log in</a>
+
+        {{/if}}
+
+    </div>

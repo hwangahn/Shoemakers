@@ -5,7 +5,7 @@ const connection = new Sequelize('test', 'newuser', 'hoanganh.012', {
     dialect: 'mysql'
 });
 
-let shoes = connection.define('shoes', {
+let shoe = connection.define('shoes', {
 
     sid: {
         type: DataTypes.INTEGER,
@@ -43,4 +43,4 @@ let shoes = connection.define('shoes', {
     updatedAt: false
 });
 
-module.exports = { shoes };
+module.exports = { shoe };

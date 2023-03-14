@@ -1,4 +1,4 @@
-const { shoes } = require('../models/goods');
+const { shoe } = require('../models/goods');
 const path = require('path');
 const { Op } = require('sequelize');
 
@@ -6,7 +6,7 @@ let getShoeByCategory = (req, res) => {
 
     if (req.params.category != "favicon.ico" && req.params.category != "search") {
 
-        let shoesFound = shoes.findAll({
+        let shoesFound = shoe.findAll({
             where: {
                 category: {
                     [Op.eq]: req.params.category
@@ -18,7 +18,8 @@ let getShoeByCategory = (req, res) => {
         .then((shoes) => {
             console.log(shoes);
             res.status(200).render('goods', {shoes: shoes,
-                                             category: req.params.category});
+                                            category: req.params.category,
+                                            authenticated: req.isAuthenticated()});
         })
         .catch(err => {
             console.log(err);
@@ -31,7 +32,7 @@ let getShoeByCategory = (req, res) => {
 
 let getShoeById = (req, res) => {
 
-    let shoesFound = shoes.findAll({
+    let shoesFound = shoe.findAll({
         where: {
             sid: {
                 [Op.eq]: req.params.sid
@@ -43,7 +44,8 @@ let getShoeById = (req, res) => {
     .then((shoe) => {
 
         console.log(shoe);
-        res.status(200).render('shoe', {shoe: shoe[0]});
+        res.status(200).render('shoe', {shoe: shoe[0], 
+                                        authenticated: req.isAuthenticated()});
 
     })
     .catch(err => {
@@ -55,7 +57,7 @@ let getShoeById = (req, res) => {
 
 let getShoeByName = (req, res) => {
 
-    let shoesFound = shoes.findAll({
+    let shoesFound = shoe.findAll({
         where: {
             name: {
                 [Op.like]: `%${req.body.name}%`
@@ -66,7 +68,8 @@ let getShoeByName = (req, res) => {
     shoesFound
     .then((shoes) => {
         console.log(shoes);
-        res.status(200).render('goods', {shoes: shoes});
+        res.status(200).render('goods', {shoes: shoes,
+                                        authenticated: req.isAuthenticated()});
     })
     .catch(err => {
         console.log(err);
