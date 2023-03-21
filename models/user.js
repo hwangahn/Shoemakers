@@ -8,7 +8,7 @@ const connection = new Sequelize('test', 'newuser', 'hoanganh.012', {
 let user = connection.define('users', {
 
     uid: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.MEDIUMINT,
         allowNull: false,
         primaryKey: true,
         autoIncrement: true
@@ -29,6 +29,6 @@ let user = connection.define('users', {
     timestamps: false,
     createdAt: false,
     updatedAt: false
-})
+});
 
 module.exports = { user };

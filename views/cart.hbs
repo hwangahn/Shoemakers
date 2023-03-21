@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Cart</title>
+    <script src="https://code.jquery.com/jquery-3.6.3.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.min.js"></script>
+</head>
+
+<body>
+    
+    {{> navbar}}
+
+    <div id="cart" style="width: 70%; float:left">
+
+        {{#each shoeInCart}}
+
+            <div id="{{sho.sid}}">
+                <a href="/category/{{sho.category}}/{{sho.sid}}"> 
+                    <img src="{{sho.imageURL}}" width="100px" height="100px">
+                    <h2>{{sho.name}}</h2>
+                </a>
+                <h3>{{sho.category}}</h3>
+                <h4>{{sho.price}}</h4>
+                <p>{{sho.description}}</p>
+
+                <input type="number" class="update" id="{{sho.sid}}" value="{{qty}}" min="1" max="50">
+
+                <button class="remove" id="{{sho.sid}}">Remove from cart</button>
+
+            </div>
+
+            <script>
+
+                $( ".update" ).keypress( function(e) {
+                    e.preventDefault();
+                });
+
+                $( ".update" ).change( function () {
+
+                    $.blockUI({
+                        overlayCSS: {
+                            backgroundColor: "00FFFF"
+                        }
+                    });
+
+                    $.post("/cart/update", {
+                        sid: $( this ).attr( "id" ),
+                        qty: $( this ).val()
+                    }, (msg) => {
+                        $.unblockUI();
+                    });
+                });
+
+                $( ".remove" ).click( function() {
+                    $.blockUI({
+                        overlayCSS: {
+                            backgroundColor: "00FFFF"
+                        }
+                    });
+
+                    $.post("/cart/delete", {
+                        sid: $( this ).attr( "id" )
+                    }, (divId) => {
+
+                        $(divId).remove();
+
+                        $.unblockUI();
+                    });
+                }); 
+
+            </script>
+
+        {{/each}}
+
+
+    </div>
+
+    <div style="width: 30%; float:right">
+
+        <p id="total">Total: </p>
+
+        <p></p>
+
+        <a href="/cart/checkout">Checkout</a>
+        
+    </div>
+
+    <div style="float: inline-block; position: fixed; bottom: 30px; right: 30px;">
+        <a href="#">Back to top</a>
+    </div>
+
+</body>

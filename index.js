@@ -1,6 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
+require('./models/initDB');
 const path = require('path');
 const verify = require('./passport/localStrategy');
 const LocalStrategy = require('passport-local');
@@ -21,16 +22,15 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
 }));
-app.use(passport.initialize());
 app.use(passport.session());
 
 
 app.set('view engine', 'hbs');
 app.use('/', require('./routers/logonRouter'));
 app.use('/', require('./routers/goodsRouter'));
+app.use('/', require('./routers/cartRouter'));
 
 app.get('/', (req, res) => {
-    console.log(req.isAuthenticated());
     res.status(200).render('home', {authenticated: req.isAuthenticated()});
 });
 

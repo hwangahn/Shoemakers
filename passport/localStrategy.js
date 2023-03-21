@@ -5,8 +5,6 @@ const passport = require('passport');
 
 let verify = (username, password, done) => {
 
-    console.log(username);
-
     user.findOne({
         where: {
             username: {

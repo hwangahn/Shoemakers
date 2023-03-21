@@ -18,15 +18,17 @@
 
     <div style="width: 80%; float:right">
         {{#each shoes}}
-            <a href="/category/{{category}}/{{sid}}"> 
-                <div>
+
+            <div>
+                <a href="/category/{{category}}/{{sid}}"> 
                     <img src="{{imageURL}}" width="100px" height="100px">
                     <h2>{{name}}</h2>
-                    <h3>{{category}}</h3>
-                    <h4>{{price}}</h4>
-                    <p>{{description}}</p>
-                </div>
-            </a>
+                </a>
+                <h3>{{category}}</h3>
+                <h4>{{price}}</h4>
+                <p>{{description}}</p>
+            </div>
+
         {{/each}}
     </div>
 

@@ -10,7 +10,8 @@ let shoe = connection.define('shoes', {
     sid: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        primaryKey: true
+        primaryKey: true,
+        autoIncrement: true
     },
 
     name: {

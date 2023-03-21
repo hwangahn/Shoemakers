@@ -2,6 +2,7 @@
 
 <head>
     <title>{{shoe.name}}</title>
+    <script src="https://code.jquery.com/jquery-3.6.3.js"></script>
 </head>
 
 <body>
@@ -22,6 +23,31 @@
         <h3>{{shoe.category}}</h3>
         <h4>{{shoe.price}}</h4>
         <p>{{shoe.description}}</p>
+
+        <button id="{{shoe.sid}}">Add to cart</button>
+
+        <script>
+
+            $( "button" ).click( function() {
+
+                console.log($(this).attr( "id" ));
+
+                $.post("/cart", {
+                    sid: $(this).attr( "id" )
+                })
+                .done((messege) => {
+
+                    if (messege == "Ok") {
+                        alert("Added to cart");
+                    } else {
+                        window.location.href = '/login'
+                    }
+
+                })
+            });
+
+        </script>
+
     </div>
     
 </body>

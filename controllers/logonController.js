@@ -5,23 +5,16 @@ const crypto = require('crypto');
 
 let loginRequest = (req, res, next) => {
 
-    console.log(req.body.username);
-    console.log(req.body.password);
-
     passport.authenticate('local', {
         session: true,
         successRedirect: '/',
-        failureRedirect: '/login'
+        failureRedirect: '/login',
     })(req, res, next);
 
 };
 
 let registerRequest = (req, res) => {
-
-    // console.log(req.body.username);
-    // console.log(req.body.password);
-    // console.log(req.body.passwordRetype);
-
+    
     if (req.body.password != req.body.passwordRetype) {
         res.status(200).render('register', {warning: "Password don't match password retyped"});
     } 
@@ -40,7 +33,7 @@ let registerRequest = (req, res) => {
         });
 
         if (count) {
-            res.status(300).render('register', {warning: "Username already exist. Choose another"});
+            res.status(200).render('register', {warning: "Username already exist. Choose another"});
         } else {
             user.create({
                 username: req.body.username,
