@@ -4,15 +4,20 @@ const { shoe } = require('../models/goods');
 const { Op } = require('sequelize');
 
 
-let getCart = (req, res) => {
+let getUsersCart = async (req, res) => {
 
     if (!req.isAuthenticated()) {
-        res.redirect('/login'); // relocate to login page, since guest cannot but stuff
-    } else {
+
+        // relocate to login page, since guest cannot but stuff
+        res.redirect('/login'); 
+        return;
+    } 
+
+    try {
 
         // check whether user has active cart or not
         // if not create one
-        cart.findOrCreate({
+        let getCart = await cart.findOrCreate({
             where: {
                 [Op.and]: [
                     { uid: { [Op.eq]: req.user.uid }},
@@ -23,52 +28,45 @@ let getCart = (req, res) => {
                 uid: req.user.uid,
                 status: "active"
             },
-        })
-        .then((theOneCart) => {
+        });
 
-            // find products and quantity of products in the cart
-            cartDetail.findAll({
-                where: {
-                    cid: {
-                        [Op.eq]: theOneCart[0].cid
-                    }
-                },
-                include: shoe,
-            })
-            .then((theOneCartDetail) => {
+        // find products and quantity of products in the cart
+        let getCartDetails = await  cartDetail.findAll({
+            where: {
+                cid: {
+                    [Op.eq]: getCart[0].cid
+                }
+            },
+            include: shoe,
+        });
 
-                // renders the cart view with items in cart
-                res.status(200).render('cart', {shoeInCart: theOneCartDetail, 
-                                                authenticated: req.isAuthenticated()});
-            })
-            .catch(err => {
+        // renders the cart view with items in cart
+        res.status(200).render('cart', {shoeInCart: getCartDetails, 
+                                        authenticated: req.isAuthenticated()});
 
-                // catch errors while searching for items in cart
-                console.log(err);
-                res.status(500);
-            });
+    } catch(err) {
 
-        })
-        .catch((err) => {
-
-            // catch errors while searching for cart
-            console.log(err);
-            res.status(500);
-        })
+        // catch errors
+        console.log(err);
+        res.status(500);
     }
 
 };
 
-let addToCart = (req, res) => {
+let addToCart = async (req, res) => {
 
     if (!req.isAuthenticated()) {
-        res.send("Needs to log in"); // sends a messege back to jquery telling that the user is browsing as a guest, and guest cannot but stuff
-    } else {
 
+        // sends a messege back to jquery telling that the user is browsing as a guest, and guest cannot but stuff
+        res.send("Needs to log in"); 
+        return;
+    }
+
+    try {
 
         // check whether user has active cart or not
         // if not create one
-        cart.findOrCreate({
+        let getCart = await cart.findOrCreate({
             where: {
                 [Op.and]: [
                     { uid: { [Op.eq]: req.user.uid }},
@@ -79,175 +77,119 @@ let addToCart = (req, res) => {
                 uid: req.user.uid,
                 status: "active"
             }
-        })
-        .then((theOneCart) => {
-
-            // checking whether item is in cart
-            cartDetail.count({
-                where: {
-                    [Op.and]: [
-                        { cid: { [Op.eq]: theOneCart[0].cid }},
-                        { sid: { [Op.eq]: req.body.sid }}
-                    ]
-                },
-            })
-            .then((data) => {
-                
-                if (!data) {
-
-                    // if not, add to cart
-                    cartDetail.create({
-                        cid: theOneCart[0].cid,
-                        sid: req.body.sid,
-                        qty: 1
-                    })
-                    .then(() => {
-
-                        // sends back the "ok" status to jquery
-                        res.status(200).send("Ok");
-                    })
-                    .catch(err => {
-
-                        // catch errors while adding item to cart
-                        console.log(err);
-                        res.status(500);
-                    });
-
-                } else {
-
-                    // else, increse the quantity by 1
-                    cartDetail.increment({
-                        qty: 1
-                    }, {
-                        where: {
-                            [Op.and]: [
-                                { sid: { [Op.eq]: req.body.sid }},
-                                { cid: { [Op.eq]: theOneCart[0].cid }}
-                            ]
-                        }
-                    })
-                    .then(() => {
-
-                        // sends back the "ok" status to jquery
-                        res.status(200).send("Ok");
-                    })
-                    .catch(err => {
-
-                        // catch errors while incresing quantity
-                        console.log(err);
-                        res.status(500);
-                    });
-
-                }
-
-            })
-            .catch(err => {
-
-                // catch errors while checking item in cart
-                console.log(err);
-                res.status(500);
-            });
-
-        })
-        .catch((err) => {
-
-            // catch errors while searching for cart
-            console.log(err);
-            res.status(500);
         });
 
-    }    
+        // check whether cart has specific item or not
+        // if not add one
+        let getCartDetail = await cartDetail.findOrCreate({
+            where: {
+                [Op.and]: [
+                    { cid: { [Op.eq]: getCart[0].cid }},
+                    { sid: { [Op.eq]: req.body.sid }}
+                ]
+            },
+            defaults: {
+                cid: getCart[0].cid,
+                sid: req.body.sid,
+                qty: 0
+            }
+        });
+
+        // increase quantity of specific item 
+        let updateCart = getCartDetail[0].increment({ qty: 1 });
+
+        updateCart;
+
+        // sends back the "ok" status 
+        res.status(200).send("Ok");
+
+    } catch(err) {
+            
+        // catch all errors
+        console.log(err);
+        res.status(500);
+    }
 
 };
 
-let updateQty = (req, res) => {
+let updateQty = async (req, res) => {
 
-    // get user's active cart
-    cart.findOne({
-        where: {
-            [Op.and]: [
-                { uid: { [Op.eq]: req.user.uid }},
-                { status: { [Op.eq]: "active" }}
-            ]
-        }
-    })
-    .then((theOneCart) => {
+    try {
+
+        // get user's active cart
+        let getCart = await cart.findOne({
+            where: {
+                [Op.and]: [
+                    { uid: { [Op.eq]: req.user.uid }},
+                    { status: { [Op.eq]: "active" }}
+                ]
+            }
+        });
 
         // update quantity of item
-        cartDetail.update({
+        let updateCart = await cartDetail.update({
             qty: req.body.qty
         }, {
             where: {
                 [Op.and]: [
-                    {cid: { [Op.eq]: theOneCart.cid}},
-                    {sid: { [Op.eq]: req.body.sid}}
+                    {cid: { [Op.eq]: getCart.cid }},
+                    {sid: { [Op.eq]: req.body.sid }}
                 ]
             }
-        })
-        .then(() => {
+        });
 
-            // confirms update success
-            res.status(200).send("Done");
-        })
-        .catch(err => {
+        updateCart;
 
-            // catch errors while updating quantity
-            console.log(err);
-            res.status(500);
-        })
+        res.status(200).send("Done");
 
-    })
-    .catch(err => {
-
-        // catch errors while getting cart
+    } catch(err) { 
+    
+        // catch all errors 
         console.log(err);
         res.status(500);
-    });
+    } 
+
 };
 
-let deleteItemFromCart = (req, res) => {
+let deleteItemFromCart = async (req, res) => {
 
-    // get user's active cart
-    cart.findOne({
-        where: {
-            [Op.and]: [
-                { uid: { [Op.eq]: req.user.uid }},
-                { status: { [Op.eq]: "active" }}
-            ]
-        }
-    })
-    .then((theOneCart) => {
-
-        // update quantity of item
-        return cartDetail.destroy({
+    try {
+        // get user's active cart
+        let getCart = await cart.findOne({
             where: {
                 [Op.and]: [
-                    {cid: { [Op.eq]: theOneCart.cid}},
-                    {sid: { [Op.eq]: req.body.sid}}
+                    { uid: { [Op.eq]: req.user.uid }},
+                    { status: { [Op.eq]: "active" }}
                 ]
             }
-        })
-        
-        .then(() => {
+        });
 
-            // confirms update success and send back id of div to remove
-            res.status(200).send(`#${req.body.sid}`);
-        })
-        .catch(err => {
+        // remove specific item from cart
+        let updateCart = cartDetail.destroy({
+            where: {
+                [Op.and]: [
+                    {cid: { [Op.eq]: getCart.cid }},
+                    {sid: { [Op.eq]: req.body.sid }}
+                ]
+            }
+        });
 
-            // catch errors while updating quantity
-            console.log(err);
-            res.status(500);
-        })
+        updateCart;
 
-    })
-    .catch(err => {
+        // confirms update success and send back id of div to remove
+        res.status(200).send(`#${req.body.sid}`);
+    } catch(err) {
 
-        // catch errors while getting cart
+        // catch all errors
         console.log(err);
         res.status(500);
-    });
+    }
 
 };
 
-module.exports = { getCart, addToCart, updateQty, deleteItemFromCart };
+module.exports = { 
+    getUsersCart, 
+    addToCart, 
+    updateQty, 
+    deleteItemFromCart 
+};

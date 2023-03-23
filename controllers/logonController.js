@@ -3,7 +3,7 @@ const passport = require('passport');
 const { Op } = require('sequelize');
 const crypto = require('crypto');
 
-let loginRequest = (req, res, next) => {
+let loginRequest = async (req, res, next) => {
 
     passport.authenticate('local', {
         session: true,
@@ -13,44 +13,49 @@ let loginRequest = (req, res, next) => {
 
 };
 
-let registerRequest = (req, res) => {
+let registerRequest = async (req, res) => {
     
     if (req.body.password != req.body.passwordRetype) {
         res.status(200).render('register', {warning: "Password don't match password retyped"});
+        return;
     } 
-    user.findAll({
-        where: {
-            username: {
-                [Op.eq]: req.body.username
-            }
-        }
-    })
-    .then(existUser => {
 
-        let count = 0;
-        existUser.forEach(Element => {
-            count ++;
+    try {
+
+        let countUserWithUsername = await user.count({
+            where: {
+                username: {
+                    [Op.eq]: req.body.username
+                }
+            }
         });
 
-        if (count) {
+        if (countUserWithUsername != 0) {
             res.status(200).render('register', {warning: "Username already exist. Choose another"});
-        } else {
-            user.create({
-                username: req.body.username,
-                password: crypto.createHmac('sha256', req.body.password)
-                                .update('very secure trust me')
-                                .digest('hex'),
-            });
-            res.status(200).redirect('/login');
-        }
-    })
-    .catch(err => {
+            return;
+        }  
+
+        let handleCreateUser = await user.create({
+            username: req.body.username,
+            password: crypto.createHmac('sha256', req.body.password)
+                            .update('very secure trust me')
+                            .digest('hex'),
+        });
+
+        handleCreateUser;
+
+        res.status(200).redirect('/login');
+        
+    } catch(err) {
+
+        // catch errors
         console.log(err);
-    });
+        res.status(500);
+    }
 
 };
 
-let logoutRequest = (req, res, next) => {
+let logoutRequest = async (req, res, next) => {
 
     req.logOut((err) => {
         res.status(500);
@@ -61,4 +66,8 @@ let logoutRequest = (req, res, next) => {
 
 }
 
-module.exports = { loginRequest, registerRequest, logoutRequest };
+module.exports = { 
+    loginRequest, 
+    registerRequest, 
+    logoutRequest 
+};

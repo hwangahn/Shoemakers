@@ -5,7 +5,7 @@ let router = express.Router();
 
 router.get('/category/:category', getShoeByCategory);
 
-router.get('/category/:category/:sid', getShoeById);
+router.get('/shoe/:sid', getShoeById);
 
 router.post('/search', getShoeByName);
 

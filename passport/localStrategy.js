@@ -14,23 +14,27 @@ let verify = (username, password, done) => {
     })
     .then(theOneUser => {
 
+        if (theOneUser === null) {
+            return done(null, false, {messege: "Wrong username or password"});
+        }
+
         const hashedPassword = crypto.createHmac('sha256', password)
                                     .update('very secure trust me')
                                     .digest('hex');    
         if (hashedPassword === theOneUser.password) {
-            done(null, theOneUser);
+            return done(null, theOneUser);
         } else {
-            done(null, false, {messege: "Incorrect information"});
+            return done(null, false, {messege: "Incorrect information"});
         }
 
     })
     .catch(err => {
         done(err);
-    })
+    });
 };
 
 passport.serializeUser((user, done) => {
-    done(null, user.uid);
+    return done(null, user.uid);
 });
 
 passport.deserializeUser((id, done) => {
@@ -42,10 +46,10 @@ passport.deserializeUser((id, done) => {
         }
     })
     .then(theOneUser => {
-        done(null, theOneUser);
+        return done(null, theOneUser);
     })
     .catch(err => {
-        done(err);
+        return done(err);
     });
 })
 

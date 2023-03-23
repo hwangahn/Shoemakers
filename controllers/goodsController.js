@@ -1,17 +1,15 @@
 const { shoe } = require('../models/goods');
 const { Op } = require('sequelize');
 
-let getShoeByCategory = (req, res) => {
+let getShoeByCategory = async (req, res) => {
 
-    let shoesFound = shoe.findAll({
+    shoe.findAll({
         where: {
             category: {
                 [Op.eq]: req.params.category
             }
-        }
-    });
-
-    shoesFound
+        },
+    })
     .then((shoes) => {
         res.status(200).render('goods', {shoes: shoes,
                                         category: req.params.category,
@@ -24,17 +22,15 @@ let getShoeByCategory = (req, res) => {
 
 };
 
-let getShoeById = (req, res) => {
+let getShoeById = async (req, res) => {
 
-    let shoesFound = shoe.findAll({
+    shoe.findAll({
         where: {
             sid: {
                 [Op.eq]: req.params.sid
             }
         }
-    });
-
-    shoesFound
+    })
     .then((shoe) => {
 
         res.status(200).render('shoe', {shoe: shoe[0], 
@@ -48,17 +44,15 @@ let getShoeById = (req, res) => {
 
 };
 
-let getShoeByName = (req, res) => {
+let getShoeByName = async (req, res) => {
 
-    let shoesFound = shoe.findAll({
+    shoe.findAll({
         where: {
             name: {
                 [Op.like]: `%${req.body.name}%`
             }
         }
-    });
-
-    shoesFound
+    })
     .then((shoes) => {
         res.status(200).render('goods', {shoes: shoes,
                                         authenticated: req.isAuthenticated()});

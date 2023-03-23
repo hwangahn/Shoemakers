@@ -24,7 +24,7 @@
         <h4>{{shoe.price}}</h4>
         <p>{{shoe.description}}</p>
 
-        <button id="{{shoe.sid}}">Add to cart</button>
+        <button class="addToCart" id="{{shoe.sid}}">Add to cart</button>
 
         <script>
 
@@ -32,7 +32,7 @@
 
                 console.log($(this).attr( "id" ));
 
-                $.post("/cart", {
+                $.post("/cart/add_item", {
                     sid: $(this).attr( "id" )
                 })
                 .done((messege) => {

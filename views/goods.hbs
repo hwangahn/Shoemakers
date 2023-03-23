@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 
 <head>
-    <title>{{category}}</title>
+    <title id="{{category}}">{{category}}</title>
+    <script src="https://code.jquery.com/jquery-3.6.3.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.min.js"></script>
 </head>
 
 <body>
@@ -10,17 +12,17 @@
 
     <div style="width: 20%; float:left">
         <div id="sort">Sort by</div>
-        <input type="checkbox" id="sortByName" value="sortName">
+        <input class="sort" type="checkbox" id="sortByName" value="sortName">
         <label for="sortByName">Sort by name</label><br>
-        <input type="checkbox" id="sortByPrice" value="sortPrice">
+        <input class="sort" type="checkbox" id="sortByPrice" value="sortPrice">
         <label for="sortByPrice">Sort by price</label><br>
     </div>
 
-    <div style="width: 80%; float:right">
+    <div class="shoes" style="width: 80%; float:right">
         {{#each shoes}}
 
             <div>
-                <a href="/category/{{category}}/{{sid}}"> 
+                <a href="/shoe/{{sid}}"> 
                     <img src="{{imageURL}}" width="100px" height="100px">
                     <h2>{{name}}</h2>
                 </a>
@@ -35,5 +37,23 @@
     <div style="float: inline-block; position: fixed; bottom: 30px; right: 30px;">
         <a href="#">Back to top</a>
     </div>
+
+    <script>
+        $('.sort').click(function(e) {
+            if (document.getElementById( $(this).attr( "id" ) ).checked == false) {
+                e.preventDefault();
+            } else {
+                $('.sort').not(this).prop('checked', false);
+
+                console.log(`/category/${$( 'title' ).attr( "id" )}/${$(this).val()}`)
+
+                $.get(`/category/${$( 'title' ).attr( "id" )}/`, {
+                    sortBy: $(this).val()
+                }, (shoes) => {
+                    alert("done");
+                })
+            }
+        });
+    </script>
 
 </body>
