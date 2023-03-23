@@ -62,7 +62,7 @@ let getCart = (req, res) => {
 let addToCart = (req, res) => {
 
     if (!req.isAuthenticated()) {
-        res.send("Not ok"); // sends a messege back to jquery telling that the user is browsing as a guest, and guest cannot but stuff
+        res.send("Needs to log in"); // sends a messege back to jquery telling that the user is browsing as a guest, and guest cannot but stuff
     } else {
 
 
@@ -219,7 +219,7 @@ let deleteItemFromCart = (req, res) => {
     .then((theOneCart) => {
 
         // update quantity of item
-        cartDetail.destroy({
+        return cartDetail.destroy({
             where: {
                 [Op.and]: [
                     {cid: { [Op.eq]: theOneCart.cid}},
@@ -227,6 +227,7 @@ let deleteItemFromCart = (req, res) => {
                 ]
             }
         })
+        
         .then(() => {
 
             // confirms update success and send back id of div to remove

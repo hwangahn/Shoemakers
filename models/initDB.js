@@ -2,6 +2,20 @@ const { user } = require('./user');
 const { cart } = require('./cart');
 const { shoe } = require('./goods');
 const { cartDetail } = require('./cartDetail');
+const { Sequelize } = require('sequelize');
+
+const connection = new Sequelize('test', 'newuser', 'hoanganh.012', {
+    host: 'localhost',
+    dialect: 'mysql'
+});
+
+connection.authenticate()
+.then(() => {
+    console.log("Connected to database");
+})
+.catch((err) => {
+    console.log(err);
+})
 
 user.hasMany(cart, {
     foreignKey: 'uid'
