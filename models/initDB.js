@@ -1,10 +1,11 @@
 const { user } = require('./user');
-const { cart } = require('./cart');
-const { shoe } = require('./goods');
-const { cartDetail } = require('./cartDetail');
+const { order } = require('./order');
+const { shoe } = require('./shoe');
+const { orderDetail } = require('./orderDetail');
 const { Sequelize } = require('sequelize');
+const { inventory } = require('./inventory');
 
-const connection = new Sequelize('test', 'newuser', 'hoanganh.012', {
+const connection = new Sequelize('dev', 'newuser', 'hoanganh.012', {
     host: 'localhost',
     dialect: 'mysql'
 });
@@ -15,50 +16,53 @@ connection.authenticate()
 })
 .catch((err) => {
     console.log(err);
-})
-
-user.hasMany(cart, {
-    foreignKey: 'uid'
-});
-cart.belongsTo(user, {
-    foreignKey: 'uid'
 });
 
-cart.belongsToMany(shoe, {
-    through: 'cartDetail',
-    foreignKey: 'cid'
+user.hasMany(order, {
+    foreignKey: 'uid'
 });
-shoe.belongsToMany(cart, {
-    through: 'cartDetail',
+order.belongsTo(user, {
+    foreignKey: 'uid'
+});
+
+order.belongsToMany(shoe, {
+    through: 'orderDetail',
+    foreignKey: 'oid'
+});
+shoe.belongsToMany(order, {
+    through: 'orderDetail',
     foreignKey: 'sid'
 });
 
-cartDetail.belongsTo(cart, {
-    foreignKey: 'cid'
+orderDetail.belongsTo(order, {
+    foreignKey: 'oid'
 });
-cart.hasMany(cartDetail, {
-    foreignKey: 'cid'
+order.hasMany(orderDetail, {
+    foreignKey: 'oid'
 });
 
-cartDetail.belongsTo(shoe, {
+orderDetail.belongsTo(shoe, {
     foreignKey: 'sid'
 });
-shoe.hasMany(cartDetail, {
+shoe.hasMany(orderDetail, {
+    foreignKey: 'sid'
+});
+
+shoe.hasMany(inventory, {
+    foreignKey: 'sid'
+});
+inventory.belongsTo(shoe, {
     foreignKey: 'sid'
 });
 
 
 user.sync().then(() => {
-    console.log("User table sync successfully");
-    cart.sync().then(() => {
-        console.log("Cart table sync successfully");
+    order.sync().then(() => {
         shoe.sync().then(() => {
-            console.log("Shoe table sync successfully");
-            cartDetail.sync().then(() => {
-                console.log("CardDetail table sync successfully");
+            inventory.sync().then(() => {
+                orderDetail.sync();
             });
         });
     });
 });
-
 

@@ -1,14 +1,14 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
-const connection = new Sequelize('test', 'newuser', 'hoanganh.012', {
+const connection = new Sequelize('dev', 'newuser', 'hoanganh.012', {
     host: 'localhost',
     dialect: 'mysql'
 });
 
-let user = connection.define('users', {
+let user = connection.define('user', {
 
     uid: {
-        type: DataTypes.MEDIUMINT,
+        type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true,
         autoIncrement: true
@@ -22,10 +22,19 @@ let user = connection.define('users', {
     password: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+
+    phone: {
+        type: DataTypes.STRING,
+        allowNull: false
+    }, 
+    address: {
+        type: DataTypes.STRING,
+        allowNull: false
     }
 
 }, {
-    tableName: "users",
+    tableName: "user",
     timestamps: false,
     createdAt: false,
     updatedAt: false

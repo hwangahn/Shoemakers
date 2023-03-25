@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Admin</title>
+    <script src="https://code.jquery.com/jquery-3.6.3.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.min.js"></script>
+</head>
+
+<body>
+    
+    <form action="/admin/create" method="post">
+
+        <label for="name">Shoe name</label><br>
+        <input type="text" name="name" id="name" required><br>
+        
+        <select name="gender" id="gender">
+            <option value="man">Man</option>
+            <option value="woman">Woman</option>
+            <option value="kid">Kid</option>
+        </select>
+
+        <label for="description">Description</label><br>
+        <input type="text" name="description" id="description" required><br>
+
+        <label for="imageURL">Image URL</label><br>
+        <input type="text" name="imageURL" id="imageURL" required><br>
+
+        <label for="price">Price</label><br>
+        <input type="text" name="price" id="price" required><br>
+
+        <label for="size">Sizes (seperated by ',')</label><br>
+        <input type="text" name="size" id="size" required><br>
+
+        <label for="qty">Quantity</label><br>
+        <input type="text" name="qty" id="qty" required><br>
+
+        <input type="submit">
+    
+    </form>
+
+    <script>
+        $( "form" ).submit( function(e) {
+
+            e.preventDefault();
+
+            $.blockUI({
+                overlayCSS: {
+                    backgroundColor: "00FFFF"
+                }
+            });
+
+            $.post("/admin/create", {
+                name: $( "#name" ).val(),
+                gender: $( "#gender" ).val(),
+                description: $( "#description" ).val(),
+                imageURL: $( "#imageURL" ).val(),
+                price: $( "#price" ).val(),
+                size: $( "#size" ).val(),
+                qty: $( "#qty" ).val()
+            })
+        })
+        .done((msg) => {
+            alert(msg);
+
+            $.unblockUI();
+        })
+    </script>
+
+</body>
+

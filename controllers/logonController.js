@@ -40,6 +40,8 @@ let registerRequest = async (req, res) => {
             password: crypto.createHmac('sha256', req.body.password)
                             .update('very secure trust me')
                             .digest('hex'),
+            phone: req.body.phone,
+            address: req.body.address
         });
 
         handleCreateUser;

@@ -1,18 +1,19 @@
-const { shoe } = require('../models/goods');
+const { shoe } = require('../models/shoe');
+const { inventory } = require('../models/inventory');
 const { Op } = require('sequelize');
 
-let getShoeByCategory = async (req, res) => {
+let getShoeByGender = async (req, res) => {
 
     shoe.findAll({
         where: {
-            category: {
-                [Op.eq]: req.params.category
+            gender: {
+                [Op.eq]: req.params.gender
             }
         },
     })
     .then((shoes) => {
         res.status(200).render('goods', {shoes: shoes,
-                                        category: req.params.category,
+                                        category: req.params.gender,
                                         authenticated: req.isAuthenticated()});
     })
     .catch(err => {
@@ -24,16 +25,27 @@ let getShoeByCategory = async (req, res) => {
 
 let getShoeById = async (req, res) => {
 
-    shoe.findAll({
+    shoe.findOne({
         where: {
             sid: {
                 [Op.eq]: req.params.sid
             }
+        },
+
+        include: {
+            model: inventory
         }
     })
     .then((shoe) => {
 
-        res.status(200).render('shoe', {shoe: shoe[0], 
+        let size = [];
+
+        shoe.inventories.forEach(element => {
+            size.push(element.size);
+        });
+
+        res.status(200).render('shoe', {shoe: shoe,
+                                        size: size, 
                                         authenticated: req.isAuthenticated()});
 
     })
@@ -65,7 +77,7 @@ let getShoeByName = async (req, res) => {
 };
 
 module.exports = {
-    getShoeByCategory,
+    getShoeByGender,
     getShoeById,
     getShoeByName
 };

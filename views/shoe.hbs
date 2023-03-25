@@ -20,20 +20,34 @@
 
     <div style="width: 50%; float:right">
         <h2>{{shoe.name}}</h2>
-        <h3>{{shoe.category}}</h3>
+        <h3>{{shoe.gender}}</h3>
         <h4>{{shoe.price}}</h4>
         <p>{{shoe.description}}</p>
 
-        <button class="addToCart" id="{{shoe.sid}}">Add to cart</button>
+        <select class="sizeSelect">
+            
+            <p>Size: </p>
+            
+            {{#each size}}
+
+                <option value="{{this}}">{{this}}</option>
+
+            {{/each}}
+
+        </select>
+
+        <button class="addToCart" id="{{shoe.sid}}" value="{{shoe.sid}}">Add to cart</button>
 
         <script>
 
             $( "button" ).click( function() {
 
                 console.log($(this).attr( "id" ));
+                console.log($( ".sizeSelect" ).val());
 
-                $.post("/cart/add_item", {
-                    sid: $(this).attr( "id" )
+                $.post("/cart/add_item/", {
+                    sid: $(this).attr( "id" ),
+                    size: $( ".sizeSelect" ).val()
                 })
                 .done((messege) => {
 

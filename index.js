@@ -29,6 +29,7 @@ app.set('view engine', 'hbs');
 app.use('/', require('./routers/logonRouter'));
 app.use('/', require('./routers/goodsRouter'));
 app.use('/', require('./routers/cartRouter'));
+app.use('/', require('./routers/adminRouter'));
 
 app.get('/', (req, res) => {
     res.status(200).render('home', {authenticated: req.isAuthenticated()});

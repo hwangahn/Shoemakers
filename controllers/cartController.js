@@ -1,10 +1,11 @@
-const { cartDetail } = require('../models/cartDetail');
-const { cart } = require('../models/cart');
-const { shoe } = require('../models/goods');
+const { orderDetail } = require('../models/orderDetail');
+const { order } = require('../models/order');
+const { shoe } = require('../models/shoe');
+const { inventory } = require('../models/inventory');
 const { Op } = require('sequelize');
 
 
-let getUsersCart = async (req, res) => {
+let getUsersOrder = async (req, res) => {
 
     if (!req.isAuthenticated()) {
 
@@ -15,9 +16,9 @@ let getUsersCart = async (req, res) => {
 
     try {
 
-        // check whether user has active cart or not
+        // check whether user has active order or not
         // if not create one
-        let getCart = await cart.findOrCreate({
+        let getOrder = await order.findOrCreate({
             where: {
                 [Op.and]: [
                     { uid: { [Op.eq]: req.user.uid }},
@@ -30,18 +31,18 @@ let getUsersCart = async (req, res) => {
             },
         });
 
-        // find products and quantity of products in the cart
-        let getCartDetails = await  cartDetail.findAll({
+        // find products and quantity of products in the order
+        let getOrderDetails = await  orderDetail.findAll({
             where: {
-                cid: {
-                    [Op.eq]: getCart[0].cid
+                oid: {
+                    [Op.eq]: getOrder[0].oid
                 }
             },
-            include: shoe,
+            include: shoe
         });
 
-        // renders the cart view with items in cart
-        res.status(200).render('cart', {shoeInCart: getCartDetails, 
+        // renders the order view with items in order
+        res.status(200).render('cart', {shoeInCart: getOrderDetails, 
                                         authenticated: req.isAuthenticated()});
 
     } catch(err) {
@@ -53,7 +54,7 @@ let getUsersCart = async (req, res) => {
 
 };
 
-let addToCart = async (req, res) => {
+let addToOrder = async (req, res) => {
 
     if (!req.isAuthenticated()) {
 
@@ -64,9 +65,9 @@ let addToCart = async (req, res) => {
 
     try {
 
-        // check whether user has active cart or not
+        // check whether user has active order or not
         // if not create one
-        let getCart = await cart.findOrCreate({
+        let getOrder = await order.findOrCreate({
             where: {
                 [Op.and]: [
                     { uid: { [Op.eq]: req.user.uid }},
@@ -79,26 +80,28 @@ let addToCart = async (req, res) => {
             }
         });
 
-        // check whether cart has specific item or not
+        // check whether order has specific item or not
         // if not add one
-        let getCartDetail = await cartDetail.findOrCreate({
+        let getOrderDetail = await orderDetail.findOrCreate({
             where: {
                 [Op.and]: [
-                    { cid: { [Op.eq]: getCart[0].cid }},
-                    { sid: { [Op.eq]: req.body.sid }}
+                    { oid: { [Op.eq]: getOrder[0].oid }},
+                    { sid: { [Op.eq]: req.body.sid }},
+                    { size: { [Op.eq]: req.body.size }}
                 ]
             },
             defaults: {
-                cid: getCart[0].cid,
+                oid: getOrder[0].oid,
                 sid: req.body.sid,
+                size: req.body.size,
                 qty: 0
             }
         });
 
         // increase quantity of specific item 
-        let updateCart = getCartDetail[0].increment({ qty: 1 });
+        let updateOrder = getOrderDetail[0].increment({ qty: 1 });
 
-        updateCart;
+        updateOrder;
 
         // sends back the "ok" status 
         res.status(200).send("Ok");
@@ -116,8 +119,8 @@ let updateQty = async (req, res) => {
 
     try {
 
-        // get user's active cart
-        let getCart = await cart.findOne({
+        // get user's active order
+        let getOrder = await order.findOne({
             where: {
                 [Op.and]: [
                     { uid: { [Op.eq]: req.user.uid }},
@@ -126,21 +129,38 @@ let updateQty = async (req, res) => {
             }
         });
 
-        // update quantity of item
-        let updateCart = await cartDetail.update({
-            qty: req.body.qty
-        }, {
+        let getInventory = await inventory.findOne({
             where: {
                 [Op.and]: [
-                    {cid: { [Op.eq]: getCart.cid }},
-                    {sid: { [Op.eq]: req.body.sid }}
+                    { sid: { [Op.eq]: req.body.sid }},
+                    { size: {[Op.eq]: req.body.size }}
                 ]
             }
         });
 
-        updateCart;
+        // check quantity in stock
+        if (getInventory.qtyInStock < req.body.qty) {
 
-        res.status(200).send("Done");
+            // out of stock
+            res.status(300).send("Out of stock");
+        }
+
+        // update quantity of item
+        let updateOrder = await orderDetail.update({
+            qty: req.body.qty
+        }, {
+            where: {
+                [Op.and]: [
+                    { oid: { [Op.eq]: getOrder.oid }},
+                    { sid: { [Op.eq]: req.body.sid }},
+                    { size: {[Op.eq]: req.body.size }}
+                ]
+            }
+        });
+
+        updateOrder;
+
+        res.status(200).send("ok");
 
     } catch(err) { 
     
@@ -151,11 +171,11 @@ let updateQty = async (req, res) => {
 
 };
 
-let deleteItemFromCart = async (req, res) => {
+let deleteItemFromOrder = async (req, res) => {
 
     try {
-        // get user's active cart
-        let getCart = await cart.findOne({
+        // get user's active order
+        let getOrder = await order.findOne({
             where: {
                 [Op.and]: [
                     { uid: { [Op.eq]: req.user.uid }},
@@ -164,20 +184,21 @@ let deleteItemFromCart = async (req, res) => {
             }
         });
 
-        // remove specific item from cart
-        let updateCart = cartDetail.destroy({
+        // remove specific item from order
+        let updateOrder = orderDetail.destroy({
             where: {
                 [Op.and]: [
-                    {cid: { [Op.eq]: getCart.cid }},
-                    {sid: { [Op.eq]: req.body.sid }}
+                    { oid: { [Op.eq]: getOrder.oid }},
+                    { sid: { [Op.eq]: req.body.sid }},
+                    { size: {[Op.eq]: req.body.size }}
                 ]
             }
         });
 
-        updateCart;
+        updateOrder;
 
         // confirms update success and send back id of div to remove
-        res.status(200).send(`#${req.body.sid}`);
+        res.status(200).send(`#tag-${req.body.sid}_${req.body.size}`);
     } catch(err) {
 
         // catch all errors
@@ -188,8 +209,8 @@ let deleteItemFromCart = async (req, res) => {
 };
 
 module.exports = { 
-    getUsersCart, 
-    addToCart, 
+    getUsersOrder, 
+    addToOrder, 
     updateQty, 
-    deleteItemFromCart 
+    deleteItemFromOrder 
 };
