@@ -150,7 +150,7 @@ let addToOrder = async (req, res) => {
         }
 
         // increase quantity of specific item 
-        let updateOrder = getOrderDetail[0].increment({ qty: 1 });
+        let updateOrder = await getOrderDetail[0].increment({ qty: 1 });
 
         updateOrder;
 
@@ -256,7 +256,7 @@ let deleteItemFromOrder = async (req, res) => {
         });
 
         // remove specific item from order
-        let updateOrder = orderDetail.destroy({
+        let updateOrder = await orderDetail.destroy({
             where: {
                 [Op.and]: [
                     { oid: { [Op.eq]: getOrder.oid }},
