@@ -22,7 +22,6 @@
         <h2>{{shoe.name}}</h2>
         <h3>{{shoe.gender}}</h3>
         <h4>{{shoe.price}}</h4>
-        <p>{{shoe.description}}</p>
 
         <select class="sizeSelect">
             
@@ -38,30 +37,27 @@
 
         <button class="addToCart" id="{{shoe.sid}}" value="{{shoe.sid}}">Add to cart</button>
 
-        <script>
-
-            $( "button" ).click( function() {
-
-                console.log($(this).attr( "id" ));
-                console.log($( ".sizeSelect" ).val());
-
-                $.post("/cart/add_item/", {
-                    sid: $(this).attr( "id" ),
-                    size: $( ".sizeSelect" ).val()
-                })
-                .done((messege) => {
-
-                    if (messege == "Ok") {
-                        alert("Added to cart");
-                    } else if (messege == "Needs to log in"){
-                        window.location.href = '/login'
-                    }
-
-                })
-            });
-
-        </script>
-
     </div>
     
 </body>
+
+<script>
+
+    $( "button" ).click( function() {
+
+        $.post("/cart/add/", {
+            sid: $(this).attr( "id" ),
+            size: $( ".sizeSelect" ).val()
+        })
+        .done((messege) => {
+
+            alert(messege);
+
+            if (messege == "Needs to log in"){
+                window.location.href = '/login'
+            }
+
+        })
+    });
+
+</script>

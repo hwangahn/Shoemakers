@@ -25,13 +25,13 @@ order.belongsTo(user, {
     foreignKey: 'uid'
 });
 
-order.belongsToMany(shoe, {
+order.belongsToMany(inventory, {
     through: 'orderDetail',
     foreignKey: 'oid'
 });
-shoe.belongsToMany(order, {
+inventory.belongsToMany(order, {
     through: 'orderDetail',
-    foreignKey: 'sid'
+    foreignKey: 'iid'
 });
 
 orderDetail.belongsTo(order, {
@@ -41,11 +41,11 @@ order.hasMany(orderDetail, {
     foreignKey: 'oid'
 });
 
-orderDetail.belongsTo(shoe, {
-    foreignKey: 'sid'
+orderDetail.belongsTo(inventory, {
+    foreignKey: 'iid'
 });
-shoe.hasMany(orderDetail, {
-    foreignKey: 'sid'
+inventory.hasMany(orderDetail, {
+    foreignKey: 'iid'
 });
 
 shoe.hasMany(inventory, {

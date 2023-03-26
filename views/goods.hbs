@@ -28,12 +28,9 @@
                 </a>
                 <h3>{{gender}}</h3>
                 <h4>{{price}}</h4>
-                <p>{{description}}</p>
             </div>
 
-            <br>
             <p>______</p>
-            <br>
 
         {{/each}}
     </div>
@@ -42,22 +39,22 @@
         <a href="#">Back to top</a>
     </div>
 
-    <script>
-        $('.sort').click(function(e) {
-            if (document.getElementById( $(this).attr( "id" ) ).checked == false) {
-                e.preventDefault();
-            } else {
-                $('.sort').not(this).prop('checked', false);
-
-                console.log(`/category/${$( 'title' ).attr( "id" )}/${$(this).val()}`)
-
-                $.get(`/category/${$( 'title' ).attr( "id" )}/`, {
-                    sortBy: $(this).val()
-                }, (shoes) => {
-                    alert("done");
-                })
-            }
-        });
-    </script>
-
 </body>
+
+<script>
+    $('.sort').click(function(e) {
+        if (document.getElementById( $(this).attr( "id" ) ).checked == false) {
+            e.preventDefault();
+        } else {
+            $('.sort').not(this).prop('checked', false);
+
+            console.log(`/category/${$( 'title' ).attr( "id" )}/${$(this).val()}`)
+
+            $.get(`/category/${$( 'title' ).attr( "id" )}/`, {
+                sortBy: $(this).val()
+            }, (shoes) => {
+                alert("done");
+            })
+        }
+    });
+</script>

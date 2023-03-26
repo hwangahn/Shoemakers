@@ -13,16 +13,10 @@ let orderDetail = connection.define('orderDetail', {
         primaryKey: true
     },
 
-    sid: {
+    iid: {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true
-    },
-
-
-    size: {
-        type: DataTypes.INTEGER,
-        allowNull: false
     },
 
     qty: {

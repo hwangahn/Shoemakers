@@ -14,18 +14,18 @@
 
         {{#each shoeInCart}}
 
-            <div class="shoe" id="tag-{{shoe.sid}}_{{size}}">
-                <a href="/category/{{shoe.gender}}/{{shoe.sid}}"> 
-                    <img src="{{shoe.imageURL}}" width="100px" height="100px">
-                    <h2>{{shoe.name}}</h2>
+            <div class="shoe" id="tag-{{iid}}">
+                <a href="/shoe/{{sid}}"> 
+                    <img src="{{imageURL}}" width="100px" height="100px">
+                    <h2>{{name}}</h2>
                 </a>
-                <h3>{{shoe.gender}}</h3>
-                <h4>{{shoe.price}}</h4>
+                <h3>{{gender}}</h3>
+                <h4>{{price}}</h4>
                 <p>Size {{size}}</p>
 
-                <input type="number" class="update" id="{{shoe.sid}}_{{size}}" value="{{qty}}" min="1" max="50">
+                <input type="number" class="update" id="{{iid}}" value="{{qty}}" min="1">
 
-                <button class="remove" value="{{shoe.sid}}_{{size}}">Remove from cart</button>
+                <button class="remove" id="{{iid}}">Remove from cart</button>
                 
                 <br>
                 <p>______</p>
@@ -35,67 +35,13 @@
 
         {{/each}}
 
-        <script>
-
-            $( ".update" ).keypress( function(e) {
-                e.preventDefault();
-            });
-
-            $( ".update" ).change( function () {
-
-                $.blockUI({
-                    overlayCSS: {
-                        backgroundColor: "00FFFF"
-                    }
-                });
-
-                $.post("/cart/update", {
-                    sid: $( this ).attr( "id" ).split("_")[0],
-                    size: $( this ).attr( "id" ).split("_")[1],
-                    qty: $( this ).val()
-                })
-                .then((msg) => {
-
-                    if (msg != "ok") {
-                        alert(msg);
-                    }
-                    $.unblockUI();
-                    
-                });
-            });
-
-            $( ".remove" ).click( function() {
-                
-                $.blockUI({
-                    overlayCSS: {
-                        backgroundColor: "00FFFF"
-                    }
-                });
-
-                $.post("/cart/delete", {
-                    sid: $( this ).val().split("_")[0],
-                    size: $( this ).val().split("_")[1]
-                })
-                .then((divId) => {
-
-                    $(divId).remove();
-
-                    $.unblockUI();
-                });
-
-            }); 
-
-        </script>
-
-
-
     </div>
 
     <div style="width: 30%; float: right">
 
         <p id="total">Total: </p>
 
-        <p></p>
+        <p class="total">{{total}}</p>
 
         <a href="/checkout">Checkout</a>
         
@@ -106,3 +52,62 @@
     </div>
 
 </body>
+
+<script>
+
+    $( ".update" ).keypress( function(e) {
+        e.preventDefault();
+    });
+
+    $( ".update" ).change( function () {
+
+        $.blockUI({
+            overlayCSS: {
+                backgroundColor: "00FFFF"
+            }
+        });
+
+        $.post("/cart/update", {
+            iid: $( this ).attr( "id" ),
+            qty: $( this ).val()
+        })
+        .done((res) => {
+
+            if (res.msg == "Out of stock") {
+
+                alert(res.msg);
+                $( this ).val( (parseInt($( this ).val()) - 1).toString() );
+            } else {
+
+                document.getElementsByClassName( "total" )[0].innerHTML = res.newTotal.toString();
+            }
+
+            $.unblockUI();
+            
+        });
+    });
+
+    $( ".remove" ).click( function() {
+        
+        $.blockUI({
+            overlayCSS: {
+                backgroundColor: "00FFFF"
+            }
+        });
+
+        $.post("/cart/delete", {
+            iid: $( this ).attr( "id" )
+        })
+        .done((res) => {
+
+            $(res.divId).remove();
+
+            document.getElementsByClassName( "total" )[0].innerHTML = res.newTotal.toString();
+
+            $.unblockUI();
+
+        });
+
+    }); 
+
+</script>

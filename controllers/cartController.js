@@ -31,18 +31,42 @@ let getUsersOrder = async (req, res) => {
             },
         });
 
-        // find products and quantity of products in the order
-        let getOrderDetails = await  orderDetail.findAll({
+        // get inventory id
+        let getOrderDetails = await orderDetail.findAll({
             where: {
                 oid: {
                     [Op.eq]: getOrder[0].oid
                 }
             },
-            include: shoe
+            include: {
+                model: inventory,
+                include: shoe
+            }
+        });
+
+        let toSend = [];
+        let total = 0;
+
+        // normalize response and calculating total cost
+        getOrderDetails.forEach(Element => {
+            toSend.push({
+                iid: Element.iid,
+                sid: Element.inventory.shoe.sid,
+                name: Element.inventory.shoe.name,
+                imageURL: Element.inventory.shoe.imageURL,
+                gender: Element.inventory.shoe.gender,
+                price: Element.inventory.shoe.price,
+                size: Element.inventory.size,
+                qty: Element.qty
+            });
+
+            total += (Element.inventory.shoe.price * Element.qty);
+
         });
 
         // renders the order view with items in order
-        res.status(200).render('cart', {shoeInCart: getOrderDetails, 
+        res.status(200).render('cart', {shoeInCart: toSend, 
+                                        total: total,
                                         authenticated: req.isAuthenticated()});
 
     } catch(err) {
@@ -80,23 +104,50 @@ let addToOrder = async (req, res) => {
             }
         });
 
+        // get inventory id
+        let getInventory = await inventory.findOne({
+            where: {
+                [Op.and]: [
+                    { sid: { [Op.eq]: req.body.sid }},
+                    { size: { [Op.eq]: req.body.size }}
+                ]
+            }
+        });
+
+        console.log(getInventory);
+
         // check whether order has specific item or not
         // if not add one
         let getOrderDetail = await orderDetail.findOrCreate({
             where: {
                 [Op.and]: [
                     { oid: { [Op.eq]: getOrder[0].oid }},
-                    { sid: { [Op.eq]: req.body.sid }},
-                    { size: { [Op.eq]: req.body.size }}
+                    { iid: { [Op.eq]: getInventory.iid }}
                 ]
             },
             defaults: {
                 oid: getOrder[0].oid,
-                sid: req.body.sid,
-                size: req.body.size,
+                iid: getInventory.iid,
                 qty: 0
             }
         });
+
+        // check whether ordered quantity exceeds quantity in stock
+        if (getOrderDetail[0].qty + 1 > getInventory.qtyInStock) {
+            
+            // destroy newly created order (qty = 0)
+            orderDetail.destroy({
+                where: {
+                    qty: { [Op.eq]: 0 }
+                }
+            })
+            .then(() => {
+                res.send("Out of stock");
+            });
+
+            return;
+
+        }
 
         // increase quantity of specific item 
         let updateOrder = getOrderDetail[0].increment({ qty: 1 });
@@ -104,7 +155,7 @@ let addToOrder = async (req, res) => {
         updateOrder;
 
         // sends back the "ok" status 
-        res.status(200).send("Ok");
+        res.send("Ok");
 
     } catch(err) {
             
@@ -129,12 +180,10 @@ let updateQty = async (req, res) => {
             }
         });
 
+        // get inventory id
         let getInventory = await inventory.findOne({
             where: {
-                [Op.and]: [
-                    { sid: { [Op.eq]: req.body.sid }},
-                    { size: {[Op.eq]: req.body.size }}
-                ]
+                iid: { [Op.eq]: req.body.iid }
             }
         });
 
@@ -142,7 +191,8 @@ let updateQty = async (req, res) => {
         if (getInventory.qtyInStock < req.body.qty) {
 
             // out of stock
-            res.status(300).send("Out of stock");
+            res.send({msg: "Out of stock"});
+            return;
         }
 
         // update quantity of item
@@ -152,15 +202,36 @@ let updateQty = async (req, res) => {
             where: {
                 [Op.and]: [
                     { oid: { [Op.eq]: getOrder.oid }},
-                    { sid: { [Op.eq]: req.body.sid }},
-                    { size: {[Op.eq]: req.body.size }}
+                    { iid: { [Op.eq]: getInventory.iid }}
                 ]
             }
         });
 
         updateOrder;
 
-        res.status(200).send("ok");
+        // get order detail
+        let getOrderDetails = await orderDetail.findAll({
+            where: {
+                oid: {
+                    [Op.eq]: getOrder.oid
+                }
+            },
+            include: {
+                model: inventory,
+                include: shoe
+            }
+        });
+
+        // update total cost
+        let total = 0;
+
+        getOrderDetails.forEach(Element => {
+
+            total += (Element.inventory.shoe.price * Element.qty);
+
+        });
+
+        res.send({msg: "ok", newTotal: total});
 
     } catch(err) { 
     
@@ -189,16 +260,38 @@ let deleteItemFromOrder = async (req, res) => {
             where: {
                 [Op.and]: [
                     { oid: { [Op.eq]: getOrder.oid }},
-                    { sid: { [Op.eq]: req.body.sid }},
-                    { size: {[Op.eq]: req.body.size }}
+                    { iid: { [Op.eq]: req.body.iid }}
                 ]
             }
         });
 
         updateOrder;
 
+        // get order detail
+        let getOrderDetails = await orderDetail.findAll({
+            where: {
+                oid: {
+                    [Op.eq]: getOrder.oid
+                }
+            },
+            include: {
+                model: inventory,
+                include: shoe
+            }
+        });
+
+        // update total cost
+        let total = 0;
+
+        getOrderDetails.forEach(Element => {
+
+            total += (Element.inventory.shoe.price * Element.qty);
+
+        });
+
         // confirms update success and send back id of div to remove
-        res.status(200).send(`#tag-${req.body.sid}_${req.body.size}`);
+        res.send({divId: `#tag-${req.body.iid}`, newTotal: total});
+
     } catch(err) {
 
         // catch all errors

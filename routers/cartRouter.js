@@ -5,7 +5,7 @@ let router = express.Router();
 
 router.get('/cart', getUsersOrder);
 
-router.post('/cart/add_item', addToOrder);
+router.post('/cart/add', addToOrder);
 
 router.post('/cart/update', updateQty);
 

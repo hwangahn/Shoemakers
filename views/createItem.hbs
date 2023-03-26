@@ -13,14 +13,12 @@
         <label for="name">Shoe name</label><br>
         <input type="text" name="name" id="name" required><br>
         
+        <label for="gender">Gender</label>
         <select name="gender" id="gender">
             <option value="man">Man</option>
             <option value="woman">Woman</option>
             <option value="kid">Kid</option>
         </select>
-
-        <label for="description">Description</label><br>
-        <input type="text" name="description" id="description" required><br>
 
         <label for="imageURL">Image URL</label><br>
         <input type="text" name="imageURL" id="imageURL" required><br>
@@ -38,33 +36,33 @@
     
     </form>
 
-    <script>
-        $( "form" ).submit( function(e) {
+</body>
 
-            e.preventDefault();
+<script>
+    $( "form" ).submit( function(e) {
 
-            $.blockUI({
-                overlayCSS: {
-                    backgroundColor: "00FFFF"
-                }
-            });
+        e.preventDefault();
 
-            $.post("/admin/create", {
-                name: $( "#name" ).val(),
-                gender: $( "#gender" ).val(),
-                description: $( "#description" ).val(),
-                imageURL: $( "#imageURL" ).val(),
-                price: $( "#price" ).val(),
-                size: $( "#size" ).val(),
-                qty: $( "#qty" ).val()
-            })
+        $.blockUI({
+            overlayCSS: {
+                backgroundColor: "00FFFF"
+            }
+        });
+
+        $.post("/admin/create", {
+            name: $( "#name" ).val(),
+            gender: $( "#gender" ).val(),
+            imageURL: $( "#imageURL" ).val(),
+            price: $( "#price" ).val(),
+            size: $( "#size" ).val(),
+            qty: $( "#qty" ).val()
         })
         .done((msg) => {
             alert(msg);
 
             $.unblockUI();
-        })
-    </script>
-
-</body>
+        });
+    });
+    
+</script>
 

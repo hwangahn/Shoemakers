@@ -10,7 +10,6 @@ let createStock = async (req, res) => {
             
             name: req.body.name,
             gender: req.body.gender,
-            description: req.body.description,
             imageURL: req.body.imageURL,
             price: req.body.price
 
@@ -31,13 +30,13 @@ let createStock = async (req, res) => {
 
         });
 
-        res.status(200).send("Done");
+        res.send("Done");
 
     } catch(err) {
 
         // catch errors
         console.log(err);
-        res.status(500).send("Try again");
+        res.send("Try again");
     }
 }
 

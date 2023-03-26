@@ -24,10 +24,6 @@ let shoe = connection.define('shoe', {
         allowNull: false
     },
 
-    description: {
-        type: DataTypes.STRING,
-    },
-
     imageURL: {
         type: DataTypes.STRING
     },
