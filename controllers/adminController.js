@@ -1,32 +1,53 @@
 const { shoe } = require('../models/shoe');
 const { inventory } = require('../models/inventory');
+const { Op } = require('sequelize');
 
-let createStock = async (req, res) => {
+let updateInventory = async (req, res) => {
 
     try {
 
         //create entry in shoe
-        let createShoe = await shoe.create({
+        let createShoe = await shoe.findOrCreate({
+
+            where: {
+                [Op.and]: [
+                    { name: {[Op.eq]: req.body.name }},
+                    { gender: {[Op.eq]: req.body.gender }}
+                ]
+            },
             
-            name: req.body.name,
-            gender: req.body.gender,
-            imageURL: req.body.imageURL,
-            price: req.body.price
+            defaults: {
+                name: req.body.name,
+                gender: req.body.gender,
+                imageURL: req.body.imageURL,
+                price: req.body.price
+            }
 
         });
 
         let sizes = req.body.size.replaceAll(' ', '').split(',');
 
         // create object for size
-        sizes.forEach(element => {
+        sizes.forEach(async (element) => {
 
-            let createInventory = inventory.create({
-                sid: createShoe.sid, 
-                size: parseInt(element), 
-                qtyInStock: parseInt(req.body.qty)
+            let getInventory = await inventory.findOrCreate({
+                where: {
+                    [Op.and]: [
+                        { sid: {[Op.eq]: createShoe[0].sid }}, 
+                        { size: {[Op.eq]: parseInt(element) }}
+                    ]
+                },
+                
+                defaults: {
+                    sid: createShoe[0].sid, 
+                    size: parseInt(element), 
+                    qtyInStock: 0
+                }
             });
 
-            createInventory;
+            let updateQty = await getInventory[0].increment({ qtyInStock: req.body.qty });
+            
+            updateQty;
 
         });
 
@@ -41,5 +62,5 @@ let createStock = async (req, res) => {
 }
 
 module.exports = {
-    createStock,
+    updateInventory,
 }

@@ -41,7 +41,9 @@ let getShoeById = async (req, res) => {
         let size = [];
 
         shoe.inventories.forEach(element => {
-            size.push(element.size);
+            if (element.qty != 0) {
+                size.push(element.size);
+            }
         });
 
         res.status(200).render('shoe', {shoe: shoe,
