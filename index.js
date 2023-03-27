@@ -1,4 +1,5 @@
 const express = require('express');
+require('longjohn');
 const session = require('express-session');
 const passport = require('passport');
 require('./models/initDB');
