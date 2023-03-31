@@ -3,10 +3,10 @@ const { getShoeByGender, getShoeById, getShoeByName } = require('../controllers/
 
 let router = express.Router();
 
-router.get('/gender/:gender', getShoeByGender);
+router.get('/api/gender/:gender', getShoeByGender);
 
-router.get('/shoe/:sid', getShoeById);
+router.get('/api/shoe/:sid', getShoeById);
 
-router.post('/search', getShoeByName);
+router.post('/api/search', getShoeByName);
 
 module.exports = router;

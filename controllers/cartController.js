@@ -59,9 +59,6 @@ let getUsersOrder = async (req, res) => {
                 size: Element.inventory.size,
                 qty: Element.qty
             });
-
-            total += (Element.inventory.shoe.price * Element.qty);
-
         });
 
         // renders the order view with items in order

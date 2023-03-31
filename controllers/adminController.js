@@ -51,13 +51,13 @@ let updateInventory = async (req, res) => {
 
         });
 
-        res.send("Done");
+        res.status(200).json({messege: "Done"});
 
     } catch(err) {
 
         // catch errors
         console.log(err);
-        res.send("Try again");
+        res.status(500).json({msg: err});
     }
 }
 

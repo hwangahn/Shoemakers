@@ -12,18 +12,18 @@ let getShoeByGender = async (req, res) => {
         },
     })
     .then((shoes) => {
-        res.status(200).render('goods', {shoes: shoes,
-                                        category: req.params.gender,
-                                        authenticated: req.isAuthenticated()});
+        res.status(200).json({ shoes: shoes, msg: ""});
     })
     .catch(err => {
         console.log(err);
-        res.status(500).send("Oops! Server side error");
+        res.status(500).json({ shoes: [], msg: "Oops! Server side error" });
     });
 
 };
 
 let getShoeById = async (req, res) => {
+
+    console.log(req.body)
 
     shoe.findOne({
         where: {
@@ -46,14 +46,12 @@ let getShoeById = async (req, res) => {
             }
         });
 
-        res.status(200).render('shoe', {shoe: shoe,
-                                        size: size, 
-                                        authenticated: req.isAuthenticated()});
+        res.status(200).json({ shoe: shoe, size: size, msg: "" });
 
     })
     .catch(err => {
         console.log(err);
-        res.status(500).send("Oops! Server side error");
+        res.status(500).json({msg: err});
     });
 
 };

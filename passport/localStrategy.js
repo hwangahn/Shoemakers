@@ -29,9 +29,44 @@ let verify = (username, password, done) => {
 
     })
     .catch(err => {
-        done(err);
+        console.log(err);
+        return done(err);
     });
 };
+
+let signup = async (req, username, password, done) => {
+    
+    try { 
+
+        let countUserWithUsername = await user.count({
+            where: {
+                username: {
+                    [Op.eq]: username
+                }
+            }
+        });
+
+        if (countUserWithUsername != 0) {
+            return done(null, false);
+        }  
+
+        let newUser = await user.create({
+            username: username,
+            password: crypto.createHmac('sha256', password)
+                            .update('very secure trust me')
+                            .digest('hex'),
+            phone: req.body.phone,
+            address: req.body.address
+        });
+
+        return done(null, newUser);
+    
+    } catch(err) {
+
+        // catch errors
+        return done(err);
+    }
+}
 
 passport.serializeUser((user, done) => {
     return done(null, user.uid);
@@ -53,4 +88,4 @@ passport.deserializeUser((id, done) => {
     });
 })
 
-module.exports = verify;
+module.exports = { verify, signup };

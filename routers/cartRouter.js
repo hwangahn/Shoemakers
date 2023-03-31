@@ -3,12 +3,12 @@ const { getUsersOrder, addToOrder, updateQty, deleteItemFromOrder } = require('.
 
 let router = express.Router();
 
-router.get('/cart', getUsersOrder);
+router.get('/api/cart', getUsersOrder);
 
-router.post('/cart/add', addToOrder);
+router.post('/api/cart/add', addToOrder);
 
-router.post('/cart/update', updateQty);
+router.post('/api/cart/update', updateQty);
 
-router.post('/cart/delete', deleteItemFromOrder);
+router.post('/api/cart/delete', deleteItemFromOrder);
 
 module.exports = router;

@@ -1,20 +1,14 @@
 const express = require('express');
-const { loginRequest, registerRequest, logoutRequest } = require('../controllers/logonController');
+const { loginRequest, registerRequest, logoutRequest, checkCredential } = require('../controllers/logonController');
 
 let router = express.Router();
 
-router.get('/login', (req, res) => {
-    res.status(200).render("login");
-});
+router.post('/api/logout', logoutRequest);
 
-router.get('/register', (req, res) => {
-    res.status(200).render("register");
-});
+router.post('/api/login', loginRequest);
 
-router.get('/logout', logoutRequest);
+router.post('/api/register', registerRequest);
 
-router.post('/login', loginRequest);
-
-router.post('/register', registerRequest);
+router.post('/api/auth', checkCredential);
 
 module.exports = router;

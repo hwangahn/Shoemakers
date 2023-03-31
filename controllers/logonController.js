@@ -1,75 +1,67 @@
-const { user } = require('../models/user');
 const passport = require('passport');
-const { Op } = require('sequelize');
-const crypto = require('crypto');
 
 let loginRequest = async (req, res, next) => {
 
-    passport.authenticate('local', {
-        session: true,
-        successRedirect: '/',
-        failureRedirect: '/login',
+    passport.authenticate('login', (err, user, info, status) => {
+        if (err) {
+            console.log(err);
+        } else if (!user) {
+            console.log(status);
+            console.log(info);
+            res.status(401).json({ path: '/login', msg: "Wrong credentials"});
+        } else {
+            req.login(user, (err) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500);
+                }
+                res.status(200).json({ path: '/', msg: "OK"});
+            });
+        }
+    })(req, res, next);
+};
+
+let registerRequest = async (req, res, next) => {
+
+    passport.authenticate('signup', (err, user, info, status) => {
+        if (err) {
+            res.statuc(500).send(err);
+        } else if (!user) {
+            console.log(status);
+            console.log(info);
+            res.status(200).json({ path: '/register', msg: "Username already exist. Choose another"});
+        } else {
+            req.login(user, (err) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500);
+                }
+                res.status(200).json({ path: '/', msg: "OK"});
+            });
+        }
     })(req, res, next);
 
 };
 
-let registerRequest = async (req, res) => {
-    
-    if (req.body.password != req.body.passwordRetype) {
-        res.status(200).render('register', {warning: "Password don't match password retyped"});
-        return;
-    } 
+let logoutRequest = (req, res) => {
 
-    try {
-
-        let countUserWithUsername = await user.count({
-            where: {
-                username: {
-                    [Op.eq]: req.body.username
-                }
-            }
-        });
-
-        if (countUserWithUsername != 0) {
-            res.status(200).render('register', {warning: "Username already exist. Choose another"});
-            return;
-        }  
-
-        let handleCreateUser = await user.create({
-            username: req.body.username,
-            password: crypto.createHmac('sha256', req.body.password)
-                            .update('very secure trust me')
-                            .digest('hex'),
-            phone: req.body.phone,
-            address: req.body.address
-        });
-
-        handleCreateUser;
-
-        res.status(200).redirect('/login');
-        
-    } catch(err) {
-
-        // catch errors
-        console.log(err);
-        res.status(500);
-    }
-
-};
-
-let logoutRequest = async (req, res, next) => {
+    console.log("called");
 
     req.logOut((err) => {
         res.status(500);
-        return next(err);
     });
 
-    res.status(200).redirect('/');
+    res.status(200).json({msg: "OK"});
 
+}
+
+let checkCredential = (req, res) => {
+    res.status(200).json({isLoggedIn: req.isAuthenticated()});
 }
 
 module.exports = { 
     loginRequest, 
     registerRequest, 
-    logoutRequest 
+    logoutRequest,
+    checkCredential 
 };
