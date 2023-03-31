@@ -1,5 +1,4 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 require('longjohn');
 const session = require('express-session');
 const passport = require('passport');
