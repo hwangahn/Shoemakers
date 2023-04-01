@@ -7,6 +7,6 @@ router.get('/api/gender/:gender', getShoeByGender);
 
 router.get('/api/shoe/:sid', getShoeById);
 
-router.post('/api/search', getShoeByName);
+router.get('/api/search/:name', getShoeByName);
 
 module.exports = router;

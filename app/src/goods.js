@@ -26,7 +26,7 @@ function ShoeCard({ sid, name, imageURL, gender, price }) {
                 className='shoe-card'
                 hoverable
                 style={{
-                    width: 300,
+                    width: "300",
                     margin: "20px",
                     borderRadius: "20px",
                     overflow: "hidden",
@@ -48,8 +48,6 @@ function ShoeCard({ sid, name, imageURL, gender, price }) {
 function ShoeRack({ props, sort }) {
 
     let [page, setPage] = useState(1);
-
-    let shoeCards = [];
 
     let shoes = props.shoes;
     let sortParam = sort.split('_');
@@ -78,18 +76,6 @@ function ShoeRack({ props, sort }) {
 
     let shoesInPage = shoes.slice((page - 1) * 3, page * 3);
 
-    shoesInPage.forEach(element => {
-        shoeCards.push(
-            <ShoeCard 
-                sid={element.sid} 
-                name={element.name} 
-                gender={element.gender} 
-                price={element.price} 
-                imageURL={element.imageURL}
-            />
-        );
-    });
-
     return (
         <div className='shoe-rack' style={{ width: "80%" , float: "right" }}>
             <div  style={{
@@ -97,7 +83,17 @@ function ShoeRack({ props, sort }) {
                 flexDirection: "row",
                 flexDrap: "wrap"
             }}>
-                {shoeCards}
+                {shoesInPage.map(element => {
+                    return (
+                        <ShoeCard 
+                            sid={element.sid} 
+                            name={element.name} 
+                            gender={element.gender} 
+                            price={`${element.price.toLocaleString('en-US')}₫`} 
+                            imageURL={element.imageURL}
+                        />
+                    )
+                })}
             </div>
             <div>
                 <Paging shoe={shoes} setPage={setPage} />
@@ -129,26 +125,25 @@ export default function GoodsView() {
     let param = useParams();
     
     useEffect(() => {
-
-        fetch('http://localhost:4000/api/auth', {
+        fetch('/api/auth', {
             method: "post",
             credentials: 'include'
         })
         .then(res => { return res.json() })
         .then(data => { setCredential(data) });
 
-        fetch(`http://localhost:4000/api/gender/${param.gender}`)
+        fetch(`/api/gender/${param.gender}`)
         .then(res => { return res.json() })
         .then(data => { setAllShoes(data) });
     }, [param]);
 
     if (credential && allShoes) {
-        console.log(credential);
+        console.log(allShoes);
         return (
             <div>
                 <NavBar props={credential} />
-                <ShoeRack props={allShoes} sort={sort} />
                 <Sort setSort={setSort} />
+                <ShoeRack props={allShoes} sort={sort} />
             </div>
         )
     } else {

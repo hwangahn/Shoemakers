@@ -5,7 +5,7 @@ export default function HomeView() {
     let [credential, setCredential] = useState();
 
     useEffect(() => {
-        fetch('http://localhost:4000/api/auth', {
+        fetch('/api/auth', {
             method: "post",
             credentials: "include"
         })

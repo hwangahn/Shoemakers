@@ -1,11 +1,10 @@
-import { Form, Input, Button, Alert, Space } from 'antd';
+import { Form, Input, Button, message } from 'antd';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 export default function LoginView() {
     let [username, setUsername] = useState("");
     let [password, setPassword] = useState("");
-    let [error, setError] = useState(false);
     let navigate = useNavigate();
     return ( 
         <div style={{width: "100%"}}>
@@ -39,7 +38,7 @@ export default function LoginView() {
                 <Form.Item>
                     <Button onClick={(e) => {
                         e.preventDefault();
-                        fetch("http://localhost:4000/api/login", {
+                        fetch("/api/login", {
                             credentials: 'include',
                             headers: {
                                 "Content-Type": "application/json",
@@ -56,7 +55,7 @@ export default function LoginView() {
                             if (data.msg === "OK") {
                                 navigate('/');
                             } else {
-                                setError(true);
+                                message.error("Wrong credentials", 3);
                             }
                         })
                     }} style={{width: "100%"}}>
@@ -65,14 +64,6 @@ export default function LoginView() {
                     Or <Link to='/register'>register now!</Link>
                 </Form.Item>
             </Form>
-            {error? 
-            <Space direction='vertical'>
-                <Alert message="Wrong credentials" type="error" closable onClose={() => {
-                    setError(false);
-                }} />
-            </Space> :
-            <></>
-            }
         </div>
     );
 };

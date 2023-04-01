@@ -1,4 +1,4 @@
-import { Form, Input, Button, Alert, Space } from 'antd';
+import { Form, Input, Button, message } from 'antd';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,8 +8,6 @@ export default function RegisterView() {
     let [passwordRetype, setPasswordRetype] = useState("");
     let [phone, setPhone] = useState("");
     let [address, setAddress] = useState("");
-    let [error, setError] = useState(false);
-    let [errMsg, setErrMsg] = useState("");
     let navigate = useNavigate();
     return ( 
         <div style={{width: "100%"}}>
@@ -83,10 +81,9 @@ export default function RegisterView() {
                     <Button onClick={(e) => {
                         e.preventDefault();
                         if (password != passwordRetype) {
-                            setErrMsg("Password and password retype doesn't match");
-                            setError(true);
+                            message.error("Password and password retype doesn't match", 3)
                         } else {
-                            fetch("http://localhost:4000/api/register", {
+                            fetch("/api/register", {
                                 headers: {
                                     "Content-Type": "application/json",
                                 },
@@ -105,7 +102,7 @@ export default function RegisterView() {
                                 if (data.msg === "OK") {
                                     navigate('/');
                                 } else {
-                                    setError(true);
+                                    message.error(data.msg, 3);
                                 }
                             });
                         }
@@ -114,14 +111,6 @@ export default function RegisterView() {
                     </Button>
                 </Form.Item>
             </Form>
-            {error? 
-            <Space direction='vertical'>
-                <Alert message={errMsg} type="error" closable onClose={() => {
-                    setError(false);
-                }} />
-            </Space> :
-            <></>
-            }
         </div>
     );
 };

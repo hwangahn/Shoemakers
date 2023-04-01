@@ -3,17 +3,15 @@ require('longjohn');
 const session = require('express-session');
 const passport = require('passport');
 require('./models/initDB');
-const path = require('path');
 const { verify, signup } = require('./passport/localStrategy');
 const LocalStrategy = require('passport-local');
-const hbs = require('hbs');
 const cors = require('cors');
-
-
-hbs.registerPartials(path.join(__dirname, '/views/partials'));
 
 let app = express();
 let port = 4000;
+
+app.set('views', './tools');
+app.set('view engine', 'hbs');
 
 app.use(cors({
     origin : "http://localhost:3000",

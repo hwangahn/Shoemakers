@@ -7,13 +7,6 @@ const { Op } = require('sequelize');
 
 let getUsersOrder = async (req, res) => {
 
-    if (!req.isAuthenticated()) {
-
-        // relocate to login page, since guest cannot but stuff
-        res.redirect('/login'); 
-        return;
-    } 
-
     try {
 
         // check whether user has active order or not
@@ -45,10 +38,14 @@ let getUsersOrder = async (req, res) => {
         });
 
         let toSend = [];
-        let total = 0;
 
         // normalize response and calculating total cost
-        getOrderDetails.forEach(Element => {
+        getOrderDetails.forEach(async (Element) => {
+
+            if (Element.inventory.qtyInStock < Element.qty) {
+                Element.update({ qty: Element.inventory.qtyInStock })  
+            }
+
             toSend.push({
                 iid: Element.iid,
                 sid: Element.inventory.shoe.sid,
@@ -57,15 +54,12 @@ let getUsersOrder = async (req, res) => {
                 gender: Element.inventory.shoe.gender,
                 price: Element.inventory.shoe.price,
                 size: Element.inventory.size,
-                qty: Element.qty
+                qty: ((Element.inventory.qtyInStock < Element.qty)? Element.inventory.qtyInStock : Element.qty)
             });
         });
 
         // renders the order view with items in order
-        res.status(200).render('cart', {shoeInCart: toSend, 
-                                        total: total,
-                                        authenticated: req.isAuthenticated()});
-
+        res.status(200).json({ shoes: toSend })
     } catch(err) {
 
         // catch errors
@@ -76,13 +70,6 @@ let getUsersOrder = async (req, res) => {
 };
 
 let addToOrder = async (req, res) => {
-
-    if (!req.isAuthenticated()) {
-
-        // sends a messege back to jquery telling that the user is browsing as a guest, and guest cannot but stuff
-        res.send("Needs to log in"); 
-        return;
-    }
 
     try {
 
@@ -139,20 +126,18 @@ let addToOrder = async (req, res) => {
                 }
             })
             .then(() => {
-                res.send("Out of stock");
+                res.status(406).json({ msg: "Out of stock" });
             });
 
-            return;
+        } else {
+
+            // increase quantity of specific item 
+            getOrderDetail[0].increment({ qty: 1 });
+
+            // sends back the "ok" status 
+            return res.status(200).json({ msg: "OK" });
 
         }
-
-        // increase quantity of specific item 
-        let updateOrder = await getOrderDetail[0].increment({ qty: 1 });
-
-        updateOrder;
-
-        // sends back the "ok" status 
-        res.send("Ok");
 
     } catch(err) {
             

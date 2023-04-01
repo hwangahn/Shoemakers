@@ -61,17 +61,16 @@ let getShoeByName = async (req, res) => {
     shoe.findAll({
         where: {
             name: {
-                [Op.like]: `%${req.body.name}%`
+                [Op.iLike]: `%${req.params.name}%`
             }
         }
     })
     .then((shoes) => {
-        res.status(200).render('goods', {shoes: shoes,
-                                        authenticated: req.isAuthenticated()});
+        res.status(200).json({ msg: "OK", shoes: shoes });
     })
     .catch(err => {
         console.log(err);
-        res.status(500).send("Oops! Server side error");
+        res.status(500).json({ msg: "Oops! Server side error" });
     });
 
 };
