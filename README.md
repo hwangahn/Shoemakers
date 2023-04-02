@@ -2,4 +2,4 @@
 
 Known issues:
 - No checkout handle yet
-- Cannot sort products
+- Cannot remove product from cart
