@@ -1,11 +1,30 @@
-import { Button, Card, message } from "antd";
+import { Affix, Avatar, Badge, Button, Card, message } from "antd";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import NavBar from "./navBar";
 const ButtonGroup = Button.Group;
 
-function ShoeCard({ iid, sid, name, imageURL, gender, price, qty, size }) {
+function ShoeCard({ props, shoeList, setShoeList }) {
+    let { iid, sid, name, imageURL, gender, price, qty, size } = props;
+    let [disabled, setDisabled] = useState(false);
+    let navigate = useNavigate();
+
+    function update(iid, qty) {
+        return fetch('/api/cart/update', {
+            method: 'post',
+            credentials: 'include',
+            headers: {
+                "Content-Type": "application/json" 
+            },
+            body: JSON.stringify({
+                iid: iid,
+                qty: qty
+            })
+        })
+        .then((res) => { return res.json() });
+    }
+
     return (
         <div>
             <Card
@@ -13,35 +32,84 @@ function ShoeCard({ iid, sid, name, imageURL, gender, price, qty, size }) {
                 className='shoe-card'
                 hoverable
                 style={{
-                    width: 600,
-                    height: 200,
+                    width: 700,
+                    height: 250,
                     margin: "20px",
                     borderRadius: "20px",
                     overflow: "hidden",
                 }}
-                cover={
-                    <Link to={{pathname: `/shoe/${sid}`}}>
-                        <img alt="example" src={imageURL} height='200' width='200' />
-                    </Link>
-                }
             >
-                <Card.Meta title={name} description={gender} />
-                <p>{`${price.toLocaleString('en-US')}₫`}</p><br/>
-                <h3>Quantity:</h3><br/>
-                <p>{qty}</p>
-                <ButtonGroup>
-                    <Button onClick={() => {}} icon={<MinusOutlined />} />
-                    <Button onClick={() => {}} icon={<PlusOutlined />} />
-                </ButtonGroup>
+                <Card.Meta 
+                    title={name} 
+                    description={gender} 
+                    avatar={<Avatar src={imageURL} shape="square" style={{height: '200px', width: '200px'}} />}
+                    style={{float: "left", width: "450px"}}
+                    onClick={() => {
+                        navigate(`/shoe/${sid}`);
+                    }}
+                />
+                <div style={{float: "right"}}>
+                    <p>{`${price.toLocaleString('en-US')}₫`}</p>
+                    <p>Size: {size}</p>
+                    <h3>
+                        Quantity:&nbsp;
+                        <Badge count={qty} />
+                    </h3>
+                    <ButtonGroup >
+                        <Button disabled={disabled} onClick={() => {
+                            setDisabled(true);
+                            let newShoeList =shoeList.map((element) => { return element });
+
+                            newShoeList.forEach(element => {
+                                if (element.iid == iid && element.qty > 1) {
+                                    update(iid, -1).then(((data) => {
+                                        if (data.msg == "OK") {
+                                            message.success("Done");
+                                            element.qty -= 1;
+                                        } else {
+                                            message.error(data.msg);
+                                        }
+                                        setDisabled(false);
+                                        setShoeList(newShoeList);
+                                    }))
+                                } else if (element.iid == iid && element.qty <= 1) {
+                                    setDisabled(false);
+                                    message.warning("Minimum 1 item");
+                                }
+                            });
+                            
+                        }} icon={<MinusOutlined />} />
+                        <Button disabled={disabled} onClick={() => {
+                            setDisabled(true);
+                            let newShoeList = shoeList.map((element) => { return element });
+
+                            newShoeList.forEach(element => {
+                                if (element.iid == iid) {
+                                    update(iid, 1).then(((data) => {
+                                        if (data.msg == "OK") {
+                                            message.success("Done");
+                                            element.qty += 1;
+                                        } else {
+                                            message.error(data.msg);
+                                        }
+                                        setDisabled(false);
+                                        setShoeList(newShoeList);
+                                    }))
+                                }
+                            });
+                        }} icon={<PlusOutlined />} />
+
+                    </ButtonGroup>
+                    <Button disabled={disabled} onClick={() => {}} type="primary">
+                        Remove 
+                    </Button>
+                </div>
             </Card>
         </div>
     )
 }
 
-function ShoeRack({ props }) {
-
-    console.log(props);
-    let shoesInPage = props.shoes;
+function ShoeRack({ shoeList, setShoeList }) {
 
     return (
         <div style={{width: "50%", float: "left"}}>
@@ -50,17 +118,12 @@ function ShoeRack({ props }) {
                 flexDirection: "column",
                 flexDrap: "wrap"
             }}>
-                {shoesInPage.map(element => {
+                {shoeList.map(element => {
                     return (
                         <ShoeCard 
-                            iid={element.iid}
-                            sid={element.sid} 
-                            name={element.name} 
-                            gender={element.gender} 
-                            price={element.price} 
-                            imageURL={element.imageURL}
-                            qty={element.qty}
-                            size={element.size}
+                            props={element}
+                            shoeList={shoeList}
+                            setShoeList={setShoeList}
                         />
                     )
                 })}
@@ -69,21 +132,30 @@ function ShoeRack({ props }) {
     );
 }
 
-function Details() {
+function Details({ total }) {
     return (
-        <div style={{width: "50%", float: "right"}}>
-            <div>
-                <h2>Total:</h2>
-                <br />
+        <Affix offsetTop={50}>
+            <div style={{width: "50%", float: "right"}}>
+                <Card style={{
+                    width: 150,
+                    margin: "20px",
+                    borderRadius: "20px",
+                    overflow: "hidden",
+                }}>
+                    <h2>Total:</h2>
+                    <p>{`${total.toLocaleString('en-US')}₫`}</p>
+                    <br />
+                    <Button type="primary">Checkout</Button>
+                </Card>
             </div>
-            <Button>Checkout</Button>
-        </div>
+        </Affix>
     )
 }
 
 export default function Cart() {
     let [credential, setCredential] = useState();
-    let [shoes, setShoes] = useState();
+    let [shoeList, setShoeList] = useState();
+    let [total, setTotal] = useState(0);
 
     let navigate = useNavigate();
 
@@ -107,16 +179,32 @@ export default function Cart() {
             credentials: "include"
         })
         .then((res) => { return res.json() })
-        .then((data) => { setShoes(data) });
+        .then((data) => { setShoeList(data.shoes.map((element) => { return element })) });
     }, []);
 
-    if (credential && shoes) {
-        console.log(shoes);
+    useEffect(() => {
+
+        if (shoeList) {
+
+            let refTotal = 0;
+
+            shoeList.forEach((element) => {
+                refTotal += element.price * element.qty;
+            });
+
+            setTotal(refTotal);
+        }
+    }, [shoeList])
+
+    if (credential && shoeList) {
         return (
             <div>
                 <NavBar props={credential}/>
-                <ShoeRack props={shoes} />
-                <Details />
+                <ShoeRack 
+                    shoeList={shoeList} 
+                    setShoeList={setShoeList}
+                />
+                <Details total={total} />
             </div>
         )
     }

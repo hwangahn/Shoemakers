@@ -6,8 +6,8 @@ const { Search } = Input;
 
 function Logon({ props }) {
     let navigate = useNavigate();
-    let [isLoggedIn, setLoggedIn] = useState(props.isLoggedIn)
-    if (isLoggedIn) {
+    let [loggedIn, setLoggedIn] = useState(props.isLoggedIn);
+    if (loggedIn) {
         return (
             <>
                 <Menu.Item key={"logout"}>
@@ -40,7 +40,7 @@ function Logon({ props }) {
     }
 }
 
-function ShoeCard({ sid, name, imageURL, gender, price }) {
+function ShoeCard({ sid, name, imageURL, gender, price, setOpen }) {
     return (
         <div>
             <Card
@@ -54,20 +54,20 @@ function ShoeCard({ sid, name, imageURL, gender, price }) {
                     overflow: "hidden",
                 }}
                 cover={
-                    <Link to={{pathname: `/shoe/${sid}`}}>
+                    <Link to={{pathname: `/shoe/${sid}`}} onClick={() => { setOpen(false) }}>
                         <img alt="example" src={imageURL} height='300' width='300' />
                     </Link>
                 }
             >
-                <Card.Meta title={name} description={gender}  />
-                <p>{`${price.toLocaleString('en-US')}₫`}</p>
+                <Card.Meta title={name} description={gender} style={{float: 'left'}} />
+                <p style={{float: 'right'}}>{`${price.toLocaleString('en-US')}₫`}</p>
                 <br />
             </Card>
         </div>
     )
 }
 
-function ShoeRack({ props }) {
+function ShoeRack({ props, setOpen }) {
 
     let shoesInPage = props.shoes;
 
@@ -85,6 +85,7 @@ function ShoeRack({ props }) {
                         gender={element.gender} 
                         price={element.price} 
                         imageURL={element.imageURL}
+                        setOpen={setOpen}
                     />
                 )
             })}
@@ -99,48 +100,52 @@ export default function NavBar({ props }) {
 
     return (
         <Affix>
-            <Menu mode="horizontal" selectedKeys={[]} style={{width: "100%"}}>
-                <Menu.Item key={"home"}>
-                    <Link to={`/`}>Home</Link>
-                </Menu.Item>
-                <Menu.Item key={"man"}>
-                    <Link to={`/gender/man`}>Man</Link>
-                </Menu.Item>
-                <Menu.Item key={"woman"}>
-                    <Link to={`/gender/woman`}>Woman</Link>
-                </Menu.Item>
-                <Menu.Item key={"kid"}>
-                    <Link to={`/gender/kid`}>Kid</Link>
-                </Menu.Item>
-                <Menu.Item key={"search"} >
-                    <Button type="primary" shape="circle" icon={<SearchOutlined />} onClick={() => {
-                        setOpen(true);
-                    }} />
-                </Menu.Item>
-                <Logon props={props} />
-            </Menu>
-            <Drawer title="Search" placement="right" onClose={() => {
-                setOpen(false);
-            }} open={open}>
-                <Search
-                    placeholder="Search..."
-                    onSearch={(keyword) => {
-                        fetch(`/api/search/${keyword}`, {
-                            method: 'get', 
-                            credentials: 'include',
-                        })
-                        .then((data) => { return data.json() })
-                        .then((shoesFound) => {
-                            setShoes(shoesFound);
-                        })
-                    }}
-                    style={{width: 325}}
-                />
-                {(shoes)? 
-                <ShoeRack props={shoes} /> :
-                <></>}
-            </Drawer>
-            <br/>
+            <div>
+                <Menu mode="horizontal" selectedKeys={[]} style={{width: "100%"}}>
+                    <Menu.Item key={"home"}>
+                        <Link to={`/`}>Home</Link>
+                    </Menu.Item>
+                    <Menu.Item key={"man"}>
+                        <Link to={`/gender/man`}>Man</Link>
+                    </Menu.Item>
+                    <Menu.Item key={"woman"}>
+                        <Link to={`/gender/woman`}>Woman</Link>
+                    </Menu.Item>
+                    <Menu.Item key={"kid"}>
+                        <Link to={`/gender/kid`}>Kid</Link>
+                    </Menu.Item>
+                    <Menu.Item key={"search"} >
+                        <Button type="primary" shape="circle" icon={<SearchOutlined />} onClick={() => {
+                            setOpen(true);
+                        }} />
+                    </Menu.Item>
+                    <Logon props={props} />
+                </Menu>
+                <Drawer title="Search" placement="right" onClose={() => {
+                    setOpen(false);
+                }} open={open}>
+                    <div>
+                        <Search
+                            placeholder="Search..."
+                            onSearch={(keyword) => {
+                                fetch(`/api/search/${keyword}`, {
+                                    method: 'get', 
+                                    credentials: 'include',
+                                })
+                                .then((data) => { return data.json() })
+                                .then((shoesFound) => {
+                                    setShoes(shoesFound);
+                                })
+                            }}
+                            style={{width: 325}}
+                        />
+                        {(shoes)? 
+                        <ShoeRack props={shoes} setOpen={setOpen} /> :
+                        <></>}
+                    </div>
+                </Drawer>
+                <br/>
+            </div>
         </ Affix>
     );
 }

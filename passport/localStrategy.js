@@ -66,6 +66,14 @@ let signup = async (req, username, password, done) => {
         // catch errors
         return done(err);
     }
+};
+
+let checkAuthenticate = (req, res, next) => {
+    if (req.isAuthenticated()) {
+        next();
+    } else {
+        res.status(401).send("Cannot access route");
+    }
 }
 
 passport.serializeUser((user, done) => {
@@ -88,4 +96,4 @@ passport.deserializeUser((id, done) => {
     });
 })
 
-module.exports = { verify, signup };
+module.exports = { verify, signup, checkAuthenticate };

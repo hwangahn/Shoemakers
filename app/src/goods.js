@@ -18,7 +18,8 @@ function Sort({ setSort }) {
     )
 }
 
-function ShoeCard({ sid, name, imageURL, gender, price }) {
+function ShoeCard({ props }) {
+    let { sid, name, imageURL, gender, price } = props;
     return (
         <div>
             <Card
@@ -38,18 +39,18 @@ function ShoeCard({ sid, name, imageURL, gender, price }) {
                 }
             >
                 <Card.Meta title={name} description={gender}  />
-                <p>{price}</p>
+                <p>{`${price.toLocaleString('en-US')}₫`}</p>
                 <br />
             </Card>
         </div>
     )
 }
 
-function ShoeRack({ props, sort }) {
+function ShoeRack({ allShoes, sort }) {
 
     let [page, setPage] = useState(1);
 
-    let shoes = props.shoes;
+    let shoes = allShoes;
     let sortParam = sort.split('_');
     
     if (sortParam[0] === "name") {
@@ -86,11 +87,7 @@ function ShoeRack({ props, sort }) {
                 {shoesInPage.map(element => {
                     return (
                         <ShoeCard 
-                            sid={element.sid} 
-                            name={element.name} 
-                            gender={element.gender} 
-                            price={`${element.price.toLocaleString('en-US')}₫`} 
-                            imageURL={element.imageURL}
+                            props={element}
                         />
                     )
                 })}
@@ -134,7 +131,7 @@ export default function GoodsView() {
 
         fetch(`/api/gender/${param.gender}`)
         .then(res => { return res.json() })
-        .then(data => { setAllShoes(data) });
+        .then(data => { setAllShoes(data.shoes) });
     }, [param]);
 
     if (credential && allShoes) {
@@ -143,7 +140,7 @@ export default function GoodsView() {
             <div>
                 <NavBar props={credential} />
                 <Sort setSort={setSort} />
-                <ShoeRack props={allShoes} sort={sort} />
+                <ShoeRack allShoes={allShoes} sort={sort} />
             </div>
         )
     } else {

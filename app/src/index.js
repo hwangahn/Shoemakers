@@ -15,7 +15,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
-      <Logo />
+        <Logo />
         <Routes>
           <Route exact path='/' Component={HomeView} />
           <Route exact path='/gender/:gender' Component={GoodsView} />

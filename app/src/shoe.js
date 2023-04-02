@@ -14,34 +14,36 @@ function ShoeImage({ imageURL }) {
 function OrderForm({ size, isLoggedIn }) {
 
     let [sizePick, setSizePick] = useState('-1');
+    let [disabled, setDisabled] = useState(false);
     
     let sizes = size;
-    let param = useParams();
     let navigate = useNavigate();
     
     return (
         <div>
-            <Select style={{width: 75}} placeholder="Size" onChange={(value) => {
+            <Select style={{width: 150}} placeholder="Size" onChange={(value) => {
                 setSizePick(value);
             }}>
-                {sizes.map(element => <option value={element}>{element}</option>)}
+                {sizes.map(element => <Select.Option value={element.iid}>{element.size}</Select.Option>)}
             </Select>
-            <Button class="addToCart" onClick={() => {
+            <Button className="addToCart" disabled={disabled} onClick={() => {
+                setDisabled(true);
                 if (!isLoggedIn) {
-                    message.error("Please log in", 3)
+                    message.error("Please log in", 3);
                     navigate('/login');
                 } else if (sizePick == "-1") {
                     message.warning("Please pick your size", 3);
+                    setDisabled(false);
                 } else {
-                    fetch('/api/cart/add', {
+                    fetch('/api/cart/update', {
                         method: 'post',
                         credentials: 'include',
                         headers: {
                             "Content-Type": "application/json" 
                         },
                         body: JSON.stringify({
-                            sid: param.sid,
-                            size: sizePick
+                            iid: sizePick,
+                            qty: 1
                         })
                     })
                     .then((res) => res.json())
@@ -51,7 +53,8 @@ function OrderForm({ size, isLoggedIn }) {
                         } else {
                             message.error(data.msg);
                         }
-                    })
+                        setDisabled(true);
+                    });
                 }
             }}>Add to cart</Button>
         </div>
@@ -104,9 +107,7 @@ export default function ShoeView() {
 
         fetch(`/api/shoe/${param.sid}`)
         .then(res => { return res.json() })
-        .then(data => { 
-            setShoeDetail(data); 
-        });
+        .then(data => { setShoeDetail(data) });
     }, [param]);
 
     if (credential && shoeDetail) {
