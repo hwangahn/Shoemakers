@@ -243,14 +243,16 @@ export default function Cart() {
     if (checkoutNumber) {
         console.log(checkoutNumber);
         return (
-            <Result
-                status="success"
-                title="Thank you for your purchase"
-                subTitle={`Order number: ${checkoutNumber} . Click 'Orders' to track your order.`}
-                extra={[
-                <Button type="primary" key="console" onClick={() => { navigate('/') }} >Home</Button>
-                ]}
-            />
+            <div>
+                <Result
+                    status="success"
+                    title="Thank you for your purchase"
+                    subTitle={`Order number: ${checkoutNumber} . Click 'Orders' to track your order.`}
+                    extra={[
+                    <Button type="primary" key="console" onClick={() => { navigate('/') }} >Home</Button>
+                    ]}
+                />
+            </div>
         )
     } else if (credential && shoeList) {
         return (
