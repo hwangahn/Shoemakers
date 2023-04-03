@@ -4,13 +4,8 @@ const { shoe } = require('../models/shoe');
 const { inventory } = require('../models/inventory');
 const { Op } = require('sequelize');
 
-
-let getUsersOrder = async (req, res) => {
-
+let getOrderDetails = async (req) => {
     try {
-
-        // check whether user has active order or not
-        // if not create one
         let getOrder = await order.findOrCreate({
             where: {
                 [Op.and]: [
@@ -36,24 +31,23 @@ let getUsersOrder = async (req, res) => {
                 include: shoe
             }
         });
-
-        let toSend = [];
+        
+        let shoeList = [];
+        let msg = [];
 
         // normalize response and calculating total cost
-        getOrderDetails.forEach(async (Element) => {
+        getOrderDetails.forEach((Element) => {
 
             // verify quantity in stock is sufficient or quantity is illegal (eg. <0)
-            if (Element.inventory.qtyInStock < 0 || Element.qty <= 0) {
+            if (Element.inventory.qtyInStock < Element.qty || Element.qty <= 0) {
 
-                // if there are none left, remove item from cart
+                // if there are none left, remove item from cart and set msg telling user that the cart has changed
+                msg.push(`${Element.inventory.shoe.gender}'s ${Element.inventory.shoe.name} Size ${Element.inventory.size} has been removed due to insufficient stock`);
                 Element.destroy();
             } else {
 
-                // if quantity in stock is less than quantity ordering
-                if (Element.inventory.qtyInStock < Element.qty) {
-                    Element.update({ qty: Element.inventory.qtyInStock });
-                }
-                toSend.push({
+                // add shoe to list
+                shoeList.push({
                     iid: Element.iid,
                     sid: Element.inventory.shoe.sid,
                     name: Element.inventory.shoe.name,
@@ -61,20 +55,24 @@ let getUsersOrder = async (req, res) => {
                     gender: Element.inventory.shoe.gender,
                     price: Element.inventory.shoe.price,
                     size: Element.inventory.size,
-                    qty: ((Element.inventory.qtyInStock < Element.qty)? Element.inventory.qtyInStock : Element.qty)
+                    qty: Element.qty
                 });
             }
         });
 
-        // renders the order view with items in order
-        res.status(200).json({ shoes: toSend })
+        return ({shoes: shoeList, msg: msg});
+
     } catch(err) {
-
-        // catch errors
         console.log(err);
-        res.status(500);
     }
+}
 
+let getUsersOrder = async (req, res) => {
+
+    let orderDetails = await getOrderDetails(req);
+
+    // renders the order view with items in order
+    res.status(200).json(orderDetails);
 };
 
 let alterOrder = async (req, res) => {
@@ -120,8 +118,6 @@ let alterOrder = async (req, res) => {
                 ]
             }
         });
-
-        console.log(getOrderDetail[0].qty);
 
         // check whether ordered quantity exceeds quantity in stock
         if (getOrderDetail[0].qty + req.body.qty > getInventory.qtyInStock ||
@@ -179,30 +175,7 @@ let deleteItemFromOrder = async (req, res) => {
 
         updateOrder;
 
-        // get order detail
-        let getOrderDetails = await orderDetail.findAll({
-            where: {
-                oid: {
-                    [Op.eq]: getOrder.oid
-                }
-            },
-            include: {
-                model: inventory,
-                include: shoe
-            }
-        });
-
-        // update total cost
-        let total = 0;
-
-        getOrderDetails.forEach(Element => {
-
-            total += (Element.inventory.shoe.price * Element.qty);
-
-        });
-
-        // confirms update success and send back id of div to remove
-        res.send({divId: `#tag-${req.body.iid}`, newTotal: total});
+        res.status(200).json({ msg: "OK" });
 
     } catch(err) {
 
@@ -213,8 +186,55 @@ let deleteItemFromOrder = async (req, res) => {
 
 };
 
+let checkout = async (req, res) => {
+
+    let { shoes, msg } = await getOrderDetails(req);
+
+    if (!msg.length) {
+        console.log("here");
+        shoes.forEach( async (Element) => {
+            let getInventory = await inventory.findOne({
+                where: {
+                    iid: {
+                        [Op.eq]: Element.iid
+                    }
+                }
+            })
+
+            getInventory.decrement( {qtyInStock: Element.qty });
+        });
+
+        let getOrder = await order.findOne({
+            where: {
+                [Op.and]: [
+                    { uid: {[Op.eq]: req.user.uid }},
+                    { status: {[Op.eq] : "active" }}
+                ]
+            }
+        })
+
+        let getAndUpdateOrder = await order.update({
+            status: "shipped"
+        }, {
+            where: {
+                [Op.and]: [
+                    { uid: {[Op.eq]: req.user.uid }},
+                    { status: {[Op.eq] : "active" }}
+                ]
+            }
+        });
+        
+        getAndUpdateOrder;
+
+        res.status(200).json({ oid: getOrder.oid, msg: "OK" });
+    } else {
+        res.status(406).json({ shoes: shoes, msg: msg });
+    }
+}
+
 module.exports = { 
     getUsersOrder, 
     alterOrder, 
-    deleteItemFromOrder 
+    deleteItemFromOrder, 
+    checkout
 };

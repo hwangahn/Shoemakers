@@ -22,7 +22,7 @@ let order = connection.define('order', {
     status: {
         type: DataTypes.STRING,
         allowNull: false
-    }    
+    }
 
 }, {
     tableName: "order",

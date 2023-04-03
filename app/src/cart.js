@@ -1,16 +1,15 @@
-import { Affix, Avatar, Badge, Button, Card, message } from "antd";
+import { Affix, Avatar, Badge, Button, Card, Spin, Result, message } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import NavBar from "./navBar";
 const ButtonGroup = Button.Group;
 
-function ShoeCard({ props, shoeList, setShoeList }) {
+function ShoeCard({ props, shoeList, setShoeList, buttonDisabled, setButtonDisabled }) {
     let { iid, sid, name, imageURL, gender, price, qty, size } = props;
-    let [disabled, setDisabled] = useState(false);
     let navigate = useNavigate();
 
-    function update(iid, qty) {
+    let update = (iid, qty) => {
         return fetch('/api/cart/update', {
             method: 'post',
             credentials: 'include',
@@ -23,6 +22,67 @@ function ShoeCard({ props, shoeList, setShoeList }) {
             })
         })
         .then((res) => { return res.json() });
+    }
+
+    let handleMinus = () => {
+        setButtonDisabled(true);
+        let newShoeList =shoeList.map((element) => { return element });
+        let alteredElement = newShoeList.find((element) => { return element.iid == iid && element.qty > 1 });
+        if (!alteredElement) {
+            setButtonDisabled(false);
+            message.warning("Minimum 1 item");
+        } else {
+            update(iid, -1).then((data) => {
+                if (data.msg == "OK") {
+                    message.success("Done");
+                    alteredElement.qty -= 1;
+                } else {
+                    message.warning(data.msg);
+                }
+                setButtonDisabled(false);
+                setShoeList(newShoeList);
+            });
+        }
+    }
+
+    let handlePlus = () => {
+        setButtonDisabled(true);
+        let newShoeList = shoeList.map((element) => { return element });
+        let alteredElement = newShoeList.find((element) => { return element.iid == iid });
+        update(iid, 1).then((data) => {
+            if (data.msg == "OK") {
+                message.success("Done");
+                alteredElement.qty += 1;
+            } else {
+                message.warning(data.msg);
+            }
+            setButtonDisabled(false);
+            setShoeList(newShoeList);
+        });
+    }
+
+    let handleRemove = () => {
+        setButtonDisabled(true);
+        let newShoeList = shoeList.filter((element) => {
+            if (element.iid != iid) { 
+                return element; 
+            }
+        });
+        fetch('/api/cart/delete', {
+            method: 'post',
+            credentials: 'include',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                iid: iid
+            })
+        })
+        .then(() => {
+            message.success("Done");
+            setButtonDisabled(false);
+            setShoeList(newShoeList);
+        });
     }
 
     return (
@@ -44,9 +104,7 @@ function ShoeCard({ props, shoeList, setShoeList }) {
                     description={gender} 
                     avatar={<Avatar src={imageURL} shape="square" style={{height: '200px', width: '200px'}} />}
                     style={{float: "left", width: "450px"}}
-                    onClick={() => {
-                        navigate(`/shoe/${sid}`);
-                    }}
+                    onClick={() => { navigate(`/shoe/${sid}`); }}
                 />
                 <div style={{float: "right"}}>
                     <p>{`${price.toLocaleString('en-US')}₫`}</p>
@@ -56,60 +114,17 @@ function ShoeCard({ props, shoeList, setShoeList }) {
                         <Badge count={qty} />
                     </h3>
                     <ButtonGroup >
-                        <Button disabled={disabled} onClick={() => {
-                            setDisabled(true);
-                            let newShoeList =shoeList.map((element) => { return element });
-
-                            newShoeList.forEach(element => {
-                                if (element.iid == iid && element.qty > 1) {
-                                    update(iid, -1).then(((data) => {
-                                        if (data.msg == "OK") {
-                                            message.success("Done");
-                                            element.qty -= 1;
-                                        } else {
-                                            message.error(data.msg);
-                                        }
-                                        setDisabled(false);
-                                        setShoeList(newShoeList);
-                                    }))
-                                } else if (element.iid == iid && element.qty <= 1) {
-                                    setDisabled(false);
-                                    message.warning("Minimum 1 item");
-                                }
-                            });
-                            
-                        }} icon={<MinusOutlined />} />
-                        <Button disabled={disabled} onClick={() => {
-                            setDisabled(true);
-                            let newShoeList = shoeList.map((element) => { return element });
-
-                            newShoeList.forEach(element => {
-                                if (element.iid == iid) {
-                                    update(iid, 1).then(((data) => {
-                                        if (data.msg == "OK") {
-                                            message.success("Done");
-                                            element.qty += 1;
-                                        } else {
-                                            message.error(data.msg);
-                                        }
-                                        setDisabled(false);
-                                        setShoeList(newShoeList);
-                                    }))
-                                }
-                            });
-                        }} icon={<PlusOutlined />} />
-
+                        <Button disabled={buttonDisabled} onClick={handleMinus} icon={<MinusOutlined />} />
+                        <Button disabled={buttonDisabled} onClick={handlePlus} icon={<PlusOutlined />} />
                     </ButtonGroup>
-                    <Button disabled={disabled} onClick={() => {}} type="primary">
-                        Remove 
-                    </Button>
+                    <Button disabled={buttonDisabled} type="primary" onClick={handleRemove} >Remove</Button>
                 </div>
             </Card>
         </div>
     )
 }
 
-function ShoeRack({ shoeList, setShoeList }) {
+function ShoeRack({ shoeList, setShoeList, buttonDisabled, setButtonDisabled }) {
 
     return (
         <div style={{width: "50%", float: "left"}}>
@@ -124,6 +139,8 @@ function ShoeRack({ shoeList, setShoeList }) {
                             props={element}
                             shoeList={shoeList}
                             setShoeList={setShoeList}
+                            buttonDisabled={buttonDisabled}
+                            setButtonDisabled={setButtonDisabled}
                         />
                     )
                 })}
@@ -132,7 +149,27 @@ function ShoeRack({ shoeList, setShoeList }) {
     );
 }
 
-function Details({ total }) {
+function Details({ total, buttonDisabled, setButtonDisabled, setShoeList, setCheckoutNumber }) {
+
+    let handleCheckout = () => {
+        setButtonDisabled(true);
+        fetch('api/checkout', {
+            method: 'post', 
+            credentials: 'include',
+        })
+        .then((res) => { return res.json() })
+        .then((data) => {
+            console.log(data);
+            if (data.msg == "OK") {
+                setCheckoutNumber(data.oid);
+            } else {
+                data.msg.map((element) => { message.warning(element) });
+                setShoeList(data.shoes);
+                setButtonDisabled(false);
+            }
+        })
+    }
+
     return (
         <Affix offsetTop={50}>
             <div style={{width: "50%", float: "right"}}>
@@ -145,7 +182,7 @@ function Details({ total }) {
                     <h2>Total:</h2>
                     <p>{`${total.toLocaleString('en-US')}₫`}</p>
                     <br />
-                    <Button type="primary">Checkout</Button>
+                    <Button type="primary" disabled={buttonDisabled} onClick={handleCheckout} >Checkout</Button>
                 </Card>
             </div>
         </Affix>
@@ -156,6 +193,8 @@ export default function Cart() {
     let [credential, setCredential] = useState();
     let [shoeList, setShoeList] = useState();
     let [total, setTotal] = useState(0);
+    let [buttonDisabled, setButtonDisabled] = useState(false);
+    let [checkoutNumber, setCheckoutNumber] = useState();
 
     let navigate = useNavigate();
 
@@ -179,7 +218,11 @@ export default function Cart() {
             credentials: "include"
         })
         .then((res) => { return res.json() })
-        .then((data) => { setShoeList(data.shoes.map((element) => { return element })) });
+        .then((data) => { 
+            setShoeList(data.shoes.map((element) => { return element }));
+            data.msg.map((msg) => message.warning(msg));
+            setButtonDisabled(data.shoes.length == 0);
+        });
     }, []);
 
     useEffect(() => {
@@ -193,19 +236,44 @@ export default function Cart() {
             });
 
             setTotal(refTotal);
+            setButtonDisabled(shoeList.length == 0);
         }
     }, [shoeList])
 
-    if (credential && shoeList) {
+    if (checkoutNumber) {
+        console.log(checkoutNumber);
+        return (
+            <Result
+                status="success"
+                title="Thank you for your purchase"
+                subTitle={`Order number: ${checkoutNumber} . Click 'Orders' to track your order.`}
+                extra={[
+                <Button type="primary" key="console" onClick={() => { navigate('/') }} >Home</Button>
+                ]}
+            />
+        )
+    } else if (credential && shoeList) {
         return (
             <div>
                 <NavBar props={credential}/>
                 <ShoeRack 
                     shoeList={shoeList} 
                     setShoeList={setShoeList}
+                    buttonDisabled={buttonDisabled}
+                    setButtonDisabled={setButtonDisabled}
                 />
-                <Details total={total} />
+                <Details 
+                    total={total} 
+                    buttonDisabled={buttonDisabled}
+                    setButtonDisabled={setButtonDisabled}
+                    setShoeList={setShoeList} 
+                    setCheckoutNumber={setCheckoutNumber}
+                />
             </div>
+        )
+    } else {
+        return (
+            <Spin />
         )
     }
 }

@@ -1,11 +1,11 @@
-import { Button, Select, Spin, message } from 'antd';
+import { Button, Card, Select, Spin, message } from 'antd';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import NavBar from './navBar';
 
 function ShoeImage({ imageURL }) {
     return (
-        <div>
+        <div style={{display: 'flex', justifyContent: 'center'}}>
             <img alt='shoeImage' src={imageURL} width="500px" height="500px" />
         </div>
     )
@@ -26,13 +26,13 @@ function OrderForm({ size, isLoggedIn }) {
             }}>
                 {sizes.map(element => <Select.Option value={element.iid}>{element.size}</Select.Option>)}
             </Select>
-            <Button className="addToCart" disabled={disabled} onClick={() => {
+            <Button className="addToCart" type='primary' disabled={disabled} onClick={() => {
                 setDisabled(true);
                 if (!isLoggedIn) {
-                    message.error("Please log in", 3);
+                    message.error("Please log in");
                     navigate('/login');
                 } else if (sizePick == "-1") {
-                    message.warning("Please pick your size", 3);
+                    message.warning("Please pick your size");
                     setDisabled(false);
                 } else {
                     fetch('/api/cart/update', {
@@ -53,7 +53,7 @@ function OrderForm({ size, isLoggedIn }) {
                         } else {
                             message.error(data.msg);
                         }
-                        setDisabled(true);
+                        setDisabled(false);
                     });
                 }
             }}>Add to cart</Button>
@@ -66,7 +66,7 @@ function Info({ name, gender, price }) {
         <div>
             <h2>{name}</h2>
             <h3>{gender}</h3>
-            <h4>{`${price.toLocaleString('en-US')}₫`}</h4>
+            <p>{`${price.toLocaleString('en-US')}₫`}</p>
         </div>
     )
 }
@@ -75,13 +75,15 @@ function Shoe({ name, gender, price, size, imageURL, credential }) {
 
     return (
         <div>
-            <div style={{width: "50%", float: "right"}}>
-                <Info 
-                    name={name} 
-                    gender={gender}
-                    price={price}
-                />
-                <OrderForm size={size} isLoggedIn={credential.isLoggedIn} />
+            <div style={{width: "50%", float: "right", justifyContent: "left"}}>
+                <Card bordered={false} style={{width: "35%"}}>
+                    <Info 
+                        name={name} 
+                        gender={gender}
+                        price={price}
+                    />
+                    <OrderForm size={size} isLoggedIn={credential.isLoggedIn} />
+                </Card>
             </div>
             <div style={{width: "50%", float: "left"}}>
                 <ShoeImage imageURL={imageURL} />
@@ -132,4 +134,3 @@ export default function ShoeView() {
         )
     }
 }
-// jsx

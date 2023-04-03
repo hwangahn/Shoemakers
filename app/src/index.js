@@ -8,14 +8,12 @@ import GoodsView from './goods';
 import ShoeView from './shoe';
 import LoginView from './login';
 import RegisterView from './register';
-import Logo from './logo';
 import Cart from './cart';
 
 function App() {
   return (
     <>
       <BrowserRouter>
-        <Logo />
         <Routes>
           <Route exact path='/' Component={HomeView} />
           <Route exact path='/gender/:gender' Component={GoodsView} />
