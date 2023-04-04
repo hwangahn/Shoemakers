@@ -4,11 +4,12 @@ const { shoe } = require('./shoe');
 const { orderDetail } = require('./orderDetail');
 const { Sequelize } = require('sequelize');
 const { inventory } = require('./inventory');
+const { review } = require('./review');
 
 let options = ["mysql://newuser:hoanganh.012@localhost/dev", 
             "postgres://hoang:mGnhdfZEcn6Gv4bXVCosunza2G2eAQHs@dpg-cg70b1d269v5l67opue0-a.singapore-postgres.render.com:5432/test_ffwb?ssl=true"];
 
-const connection = new Sequelize(options[1]);
+const connection = new Sequelize(options[0]);
 
 connection.authenticate()
 .then(() => {
@@ -52,6 +53,29 @@ inventory.belongsTo(shoe, {
     foreignKey: 'sid'
 });
 
+user.belongsToMany(shoe, {
+    through: 'review',
+    foreignKey: 'uid'
+});
+shoe.belongsToMany(user, {
+    through: 'review',
+    foreignKey: 'uid'
+});
+
+review.belongsTo(user, {
+    foreignKey: 'uid'
+});
+user.hasMany(review, {
+    foreignKey: 'uid'
+});
+
+review.belongsTo(shoe, {
+    foreignKey: 'sid'
+});
+shoe.hasMany(review, {
+    foreignKey: 'sid'
+});
+
 
 user.sync()
 .then(() => {
@@ -66,7 +90,10 @@ user.sync()
 .then(() => {
     return orderDetail.sync();
 })
+.then(() => {
+    return review.sync();
+})
 .catch((err) => {
     console.log(err);
-})
+});
 

@@ -23,18 +23,14 @@ function Logon({ props }) {
                     }}>Log out</Button>
                 </Menu.Item>
                 <Menu.Item key={"cart"}>
-                    <Button onClick={() => {
-                        navigate('/cart');
-                    }}>Cart</Button>
+                    <Button onClick={() => { navigate('/cart'); }}>Cart</Button>
                 </Menu.Item>
             </>
         );
     } else {
         return (
             <Menu.Item key={"login"}>
-                <Button type="primary" onClick={() => {
-                    navigate('/login');
-                }}>Log in</Button>
+                <Button type="primary" onClick={() => { navigate('/login'); }}>Log in</Button>
             </Menu.Item>
         )
     }
@@ -101,7 +97,7 @@ export default function NavBar({ props }) {
     return (
         <Affix>
             <div>
-                <Menu mode="horizontal" selectedKeys={[]} style={{width: "100%"}}>
+                <Menu mode="horizontal" defaultSelectedKeys={[]} style={{width: "100%"}}>
                     <Menu.Item key={"home"}>
                         <Link to={`/`}>Home</Link>
                     </Menu.Item>

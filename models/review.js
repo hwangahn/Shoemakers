@@ -5,35 +5,32 @@ let options = ["mysql://newuser:hoanganh.012@localhost/dev",
 
 const connection = new Sequelize(options[0]);
 
-let inventory = connection.define('inventory', {
+let review = connection.define('review', {
 
-    iid: {
-        primaryKey: true,
+    uid: {
         type: DataTypes.INTEGER,
-        autoIncrement: true,
-        allowNull: false
-    }, 
+        allowNull: false,
+        primaryKey: true
+    },
 
     sid: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        primaryKey: true
     },
 
-    size: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-    },
-
-    qtyInStock: {
-        type: DataTypes.INTEGER,
+    review: {
+        type: DataTypes.TEXT,
         allowNull: false
     }
 
 }, {
-    tableName: "inventory",
+    tableName: "review",
     timestamps: false,
     createdAt: false,
     updatedAt: false
 });
 
-module.exports = { inventory };
+module.exports = {
+    review
+};

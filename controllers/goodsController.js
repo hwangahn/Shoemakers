@@ -47,7 +47,14 @@ let getShoeById = async (req, res) => {
             }
         });
 
-        res.status(200).json({ shoe: shoe, size: size, msg: "" });
+        let detail = {
+            name: shoe.name, 
+            gender: shoe.gender, 
+            imageURL: shoe.imageURL,
+            price: shoe.price
+        }
+
+        res.status(200).json({ shoe: detail, size: size, msg: "" });
 
     })
     .catch(err => {

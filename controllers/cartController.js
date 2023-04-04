@@ -211,20 +211,22 @@ let checkout = async (req, res) => {
                     { status: {[Op.eq] : "active" }}
                 ]
             }
-        })
-
-        let getAndUpdateOrder = await order.update({
-            status: "shipped"
-        }, {
-            where: {
-                [Op.and]: [
-                    { uid: {[Op.eq]: req.user.uid }},
-                    { status: {[Op.eq] : "active" }}
-                ]
-            }
         });
+
+        getOrder.update({ status: "shipped" });
+
+        // let getAndUpdateOrder = await order.update({
+        //     status: "shipped"
+        // }, {
+        //     where: {
+        //         [Op.and]: [
+        //             { uid: {[Op.eq]: req.user.uid }},
+        //             { status: {[Op.eq] : "active" }}
+        //         ]
+        //     }
+        // });
         
-        getAndUpdateOrder;
+        // getAndUpdateOrder;
 
         res.status(200).json({ oid: getOrder.oid, msg: "OK" });
     } else {

@@ -18,6 +18,38 @@ function OrderForm({ size, isLoggedIn }) {
     
     let sizes = size;
     let navigate = useNavigate();
+
+    let handleAddToCart = () => {
+        setDisabled(true);
+        if (!isLoggedIn) {
+            message.error("Please log in");
+            navigate('/login');
+        } else if (sizePick == "-1") {
+            message.warning("Please pick your size");
+            setDisabled(false);
+        } else {
+            fetch('/api/cart/update', {
+                method: 'post',
+                credentials: 'include',
+                headers: {
+                    "Content-Type": "application/json" 
+                },
+                body: JSON.stringify({
+                    iid: sizePick,
+                    qty: 1
+                })
+            })
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.msg === "OK") {
+                    message.success("Added to cart");
+                } else {
+                    message.error(data.msg);
+                }
+                setDisabled(false);
+            });
+        }
+    }
     
     return (
         <div>
@@ -26,37 +58,7 @@ function OrderForm({ size, isLoggedIn }) {
             }}>
                 {sizes.map(element => <Select.Option value={element.iid}>{element.size}</Select.Option>)}
             </Select>
-            <Button className="addToCart" type='primary' disabled={disabled} onClick={() => {
-                setDisabled(true);
-                if (!isLoggedIn) {
-                    message.error("Please log in");
-                    navigate('/login');
-                } else if (sizePick == "-1") {
-                    message.warning("Please pick your size");
-                    setDisabled(false);
-                } else {
-                    fetch('/api/cart/update', {
-                        method: 'post',
-                        credentials: 'include',
-                        headers: {
-                            "Content-Type": "application/json" 
-                        },
-                        body: JSON.stringify({
-                            iid: sizePick,
-                            qty: 1
-                        })
-                    })
-                    .then((res) => res.json())
-                    .then((data) => {
-                        if (data.msg === "OK") {
-                            message.success("Added to cart");
-                        } else {
-                            message.error(data.msg);
-                        }
-                        setDisabled(false);
-                    });
-                }
-            }}>Add to cart</Button>
+            <Button className="addToCart" type='primary' disabled={disabled} onClick={handleAddToCart}>Add to cart</Button>
         </div>
     )
 }
@@ -71,7 +73,17 @@ function Info({ name, gender, price }) {
     )
 }
 
-function Shoe({ name, gender, price, size, imageURL, credential }) {
+function Review({ props }) {
+
+}
+
+function ReviewForm() {
+
+}
+
+function Shoe({ props, size, credential }) {
+
+    let { name, gender, price, imageURL } = props;
 
     return (
         <div>
@@ -117,11 +129,8 @@ export default function ShoeView() {
             <div>
                 <NavBar props={credential} />
                 <Shoe 
-                    name={shoeDetail.shoe.name}
-                    gender={shoeDetail.shoe.gender}
-                    price={shoeDetail.shoe.price}
+                    props={shoeDetail.shoe}
                     size={shoeDetail.size}
-                    imageURL={shoeDetail.shoe.imageURL}
                     credential={credential}
                 />
             </div>
