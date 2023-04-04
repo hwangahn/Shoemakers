@@ -33,10 +33,10 @@ app.use(session({
 }));
 app.use(passport.session());
 
-app.use('/', require('./routers/logonRouter'));
-app.use('/', require('./routers/goodsRouter'));
-app.use('/', require('./routers/cartRouter'));
-app.use('/', require('./routers/adminRouter'));
+app.use('/', require('./APIs/logonAPI'));
+app.use('/', require('./APIs/goodsAPI'));
+app.use('/', require('./APIs/cartAPI'));
+app.use('/', require('./APIs/adminAPI'));
 
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);
