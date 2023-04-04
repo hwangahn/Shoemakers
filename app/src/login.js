@@ -18,9 +18,7 @@ export default function LoginView() {
                         },
                     ]}
                 >
-                    <Input placeholder="Username" value={username} onChange={(e) => {
-                        setUsername(e.target.value);
-                    }} />
+                    <Input placeholder="Username" value={username} onChange={(e) => { setUsername(e.target.value); }} />
                 </Form.Item>
                 <Form.Item
                     name="password"
@@ -31,37 +29,37 @@ export default function LoginView() {
                         },
                     ]}
                 >
-                    <Input type="password" placeholder="Password" value={password} onChange={(e) => {
-                        setPassword(e.target.value);
-                    }} />
+                    <Input type="password" placeholder="Password" value={password} onChange={(e) => { setPassword(e.target.value); }} />
                 </Form.Item>
                 <Form.Item>
                     <Button onClick={(e) => {
-                        e.preventDefault();
-                        fetch("/api/login", {
-                            credentials: 'include',
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            method: "post",
-                            body: JSON.stringify({
-                                username: username,
-                                password: password
+                        if (password !== "" && username !== "") {
+                            e.preventDefault();
+                            fetch("/api/login", {
+                                credentials: 'include',
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                method: "post",
+                                body: JSON.stringify({
+                                    username: username,
+                                    password: password
+                                })
                             })
-                        })
-                        .then(res => {return res.json()})
-                        .then(data => {
-                            console.log(data);
-                            if (data.msg === "OK") {
-                                navigate('/');
-                            } else {
-                                message.error("Wrong credentials", 3);
-                            }
-                        })
+                            .then(res => {return res.json()})
+                            .then(data => {
+                                console.log(data);
+                                if (data.msg === "OK") {
+                                    navigate('/');
+                                } else {
+                                    message.error("Wrong credentials", 3);
+                                }
+                            });
+                        }
                     }} style={{width: "100%"}}>
-                    Log in
+                        Log in
                     </Button>
-                    Or <Link to='/register'>register now!</Link>
+                    Or <Link to='/register'>Register now!</Link>
                 </Form.Item>
             </Form>
         </div>

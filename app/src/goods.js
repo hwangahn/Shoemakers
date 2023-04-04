@@ -6,9 +6,7 @@ import NavBar from './navBar';
 function Sort({ setSort }) {
     return (
         <div style={{ width: "20%" , float: "left" }}>
-            <Select style={{width: 200}} placeholder="Sort by..." onChange={(value) => {
-                setSort(value)
-            }}>
+            <Select style={{width: 200}} placeholder="Sort by..." onChange={(value) => { setSort(value); }}>
                 <Select.Option value="price_asc">Sort by price ascending</Select.Option>
                 <Select.Option value="price_desc">Sort by price descending</Select.Option>
                 <Select.Option value="name_asc">Sort by name ascending</Select.Option>
@@ -106,9 +104,7 @@ function Paging({ shoe, setPage }) {
                 defaultCurrent={1}
                 pageSize={3}
                 total={shoe.length}
-                onChange={(value) => {
-                    setPage(value)
-                }}
+                onChange={(value) => { setPage(value); }}
             />
         </div>
     );
@@ -135,7 +131,6 @@ export default function GoodsView() {
     }, [param]);
 
     if (credential && allShoes) {
-        console.log(allShoes);
         return (
             <div>
                 <NavBar props={credential} />

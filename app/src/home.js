@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import NavBar from './navBar';
+import { Carousel } from 'antd';
 
 export default function HomeView() {
     let [credential, setCredential] = useState();
@@ -14,7 +15,27 @@ export default function HomeView() {
     }, []);
     if (credential) {
         return (
-            <NavBar props={credential} />
+            <div>
+                <div>
+                    <NavBar props={credential} />
+                </div>
+                <div>
+                    <Carousel autoplay={true} dots={true}>
+                        <div>
+                            <h3>1</h3>
+                        </div>
+                        <div>
+                            <h3>2</h3>
+                        </div>
+                        <div>
+                            <h3>3</h3>
+                        </div>
+                        <div>
+                            <h3>4</h3>
+                        </div>
+                    </Carousel>
+                </div>
+            </div>
         );
     }
 }

@@ -1,5 +1,9 @@
 const { shoe } = require('../models/shoe');
 const { inventory } = require('../models/inventory');
+const { review } = require('../models/review');
+const { user } = require('../models/user');
+const { order } = require('../models/order')
+const { orderDetail } = require('../models/orderDetail');
 const { Op } = require('sequelize');
 
 let getShoeByGender = async (req, res) => {
@@ -12,18 +16,16 @@ let getShoeByGender = async (req, res) => {
         },
     })
     .then((shoes) => {
-        res.status(200).json({ shoes: shoes, msg: ""});
+        res.status(200).json({ shoes: shoes});
     })
     .catch(err => {
         console.log(err);
-        res.status(500).json({ shoes: [], msg: "Oops! Server side error" });
+        res.status(500).json({ shoes: [] });
     });
 
 };
 
 let getShoeById = async (req, res) => {
-
-    console.log(req.body)
 
     shoe.findOne({
         where: {
@@ -32,19 +34,28 @@ let getShoeById = async (req, res) => {
             }
         },
 
-        include: {
-            model: inventory
-        }
+        include: [
+            { model: inventory }, 
+            { 
+                model: review, 
+                include: { model: user }
+            }
+        ]
     })
     .then((shoe) => {
 
         let size = [];
+        let review = [];
 
         shoe.inventories.forEach(element => {
 
             if (element.qtyInStock != 0) {
                 size.push({ iid: element.iid, size: element.size});
             }
+        });
+
+        shoe.reviews.forEach(element => {
+            review.push({ review: element.review, username: element.user.username });
         });
 
         let detail = {
@@ -54,7 +65,7 @@ let getShoeById = async (req, res) => {
             price: shoe.price
         }
 
-        res.status(200).json({ shoe: detail, size: size, msg: "" });
+        res.status(200).json({ shoe: detail, review: review, size: size, msg: "" });
 
     })
     .catch(err => {
@@ -83,8 +94,53 @@ let getShoeByName = async (req, res) => {
 
 };
 
+let addReview = async (req, res) => {
+
+    let checkExistingReview = await review.findOne({
+        where: {
+            [Op.and]: [
+                {uid: {[Op.eq]: req.user.uid }},
+                {sid: {[Op.eq]: req.params.sid }}
+            ]
+        }
+    });
+
+    if (checkExistingReview) {
+        return res.status(409).json({ msg: "You have already reviewed this shoe" });
+    } 
+
+    let checkPurchased = await order.findOne({
+        where: {
+            [Op.and]: [
+                { uid: { [Op.eq]: req.user.uid }},
+                { status: {[Op.eq]: "shipped" }}
+            ]
+        }, 
+        include: {
+            model: inventory,
+            where: {
+                sid: { [Op.eq]: req.params.sid}
+            }
+        }
+    });
+
+    if (checkPurchased) {
+        let theReview = await review.create({
+            uid: req.user.uid,
+            sid: req.params.sid,
+            review: req.body.review
+        });
+
+        return res.status(200).json({ msg: "OK", review: { review: theReview.review, username: req.user.username }});
+    } else {
+        return res.status(405).json({ msg: "You need to buy the shoe before reviewing" });
+    }
+
+}
+
 module.exports = {
     getShoeByGender,
     getShoeById,
-    getShoeByName
+    getShoeByName, 
+    addReview
 };

@@ -1,7 +1,8 @@
-import { Button, Card, Select, Spin, message } from 'antd';
+import { Button, Card, Divider, Form, Select, Space, Spin, message } from 'antd';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import NavBar from './navBar';
+import TextArea from 'antd/es/input/TextArea';
 
 function ShoeImage({ imageURL }) {
     return (
@@ -74,11 +75,83 @@ function Info({ name, gender, price }) {
 }
 
 function Review({ props }) {
-
+    let { username, review } = props;
+    return (
+        <Card style={{ marginTop: "16" }} title={username} >
+            {review}
+        </Card>
+    )
 }
 
-function ReviewForm() {
+function ReviewForm({ credential, reviews, setReviews, sid }) {
 
+    let [review, setReview] = useState("");
+    let [formDisabled, setFormDiabled] = useState(false);
+
+    let handleReview = (e) => {
+        e.preventDefault();
+        if (review !== "") {
+            setFormDiabled(true);
+            fetch(`/api/shoe/${sid}/review`, {
+                method: 'post', 
+                credentials: 'include',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    review: review
+                })
+            })
+            .then((res) => { return res.json(); })
+            .then((data) => {
+                if (data.msg != "OK") {
+                    message.error(data.msg);
+                } else {
+                    let newReviews = reviews.map((element) => { return element; });
+                    newReviews.push(data.review);
+                    setReviews(newReviews);
+                    message.success("Done");
+                }
+                setFormDiabled(false);
+            });
+        } else {
+            message.warning("Write your review");
+        }
+    }
+
+    return (
+        <div style={{ width: "100%", display: 'flex', flexDirection: 'column', justifyContent: 'center' }} >
+            <Space 
+                direction="vertical"
+                size="middle"
+                style={{ width: "50%", margin: "0 auto" }}
+            >
+                {credential.isLoggedIn &&
+                <Form>
+                    
+                    <Form.Item
+                        name="Review"
+                        rules={[
+                            {
+                                required: true,
+                            },
+                        ]}
+                    >
+                        <TextArea rows={4} placeholder='Your review' showCount maxLength={150} disabled={formDisabled} onChange={(e) => { setReview(e.target.value); }} />
+                    </Form.Item>
+                    <Form.Item>
+                        <Button type='primary' disabled={formDisabled} style={{ alignSelf: "right" }} onClick={handleReview} >
+                            Submit
+                        </Button>
+                    </Form.Item>
+                </Form>
+                }   
+            </Space>
+            <div style={{ width: "50%", margin: "0 auto" }} >
+                {reviews.map((element) => { return <Review props={element} /> })}
+            </div>
+        </div>
+    )
 }
 
 function Shoe({ props, size, credential }) {
@@ -108,6 +181,8 @@ function Shoe({ props, size, credential }) {
 export default function ShoeView() {
     let [credential, setCredential] = useState();
     let [shoeDetail, setShoeDetail] = useState();
+    let [size, setSize] = useState();
+    let [reviews, setReviews] = useState();
 
     let param = useParams();
     
@@ -121,24 +196,40 @@ export default function ShoeView() {
 
         fetch(`/api/shoe/${param.sid}`)
         .then(res => { return res.json() })
-        .then(data => { setShoeDetail(data) });
+        .then(data => { 
+            setShoeDetail(data.shoe); 
+            setReviews(data.review);
+            setSize(data.size);
+        });
     }, [param]);
 
     if (credential && shoeDetail) {
         return (
             <div>
-                <NavBar props={credential} />
-                <Shoe 
-                    props={shoeDetail.shoe}
-                    size={shoeDetail.size}
-                    credential={credential}
-                />
+                <div style={{height: "600px"}}>
+                    <NavBar props={credential} />
+                    <Shoe 
+                        props={shoeDetail}
+                        size={size}
+                        credential={credential}
+                    />
+                </div>
+                <Divider>Reviews</Divider>
+                <div style={{width: "100%", display: 'flex', justifyContent: 'center'}}>
+                    <ReviewForm 
+                        credential={credential}
+                        reviews={reviews} 
+                        setReviews={setReviews}
+                        sid={param.sid}
+                    />
+                </div>
+                <br/>
             </div>
         )
     } else {
         return (
             <div>
-                <Spin />
+                <Spin  />
             </div>
         )
     }
