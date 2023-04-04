@@ -7,29 +7,32 @@ const { Search } = Input;
 function Logon({ props }) {
     let navigate = useNavigate();
     let [loggedIn, setLoggedIn] = useState(props.isLoggedIn);
+
+    let handleLogout = () => {
+        fetch('/api/logout', {
+            credentials: 'include',
+            method: 'post'
+        })
+        .then(() => {
+            setLoggedIn(false);
+            navigate('/');
+        })
+    }
+
     if (loggedIn) {
         return (
             <>
-                <Menu.Item key={"logout"}>
-                    <Button type="primary" onClick={() => {
-                        fetch('/api/logout', {
-                            credentials: 'include',
-                            method: 'post'
-                        })
-                        .then(() => {
-                            setLoggedIn(false);
-                            navigate('/');
-                        })
-                    }}>Log out</Button>
+                <Menu.Item key={"logout"} >
+                    <Button type="primary" onClick={handleLogout}>Log out</Button>
                 </Menu.Item>
-                <Menu.Item key={"cart"}>
+                <Menu.Item key={"cart"} >
                     <Button onClick={() => { navigate('/cart'); }}>Cart</Button>
                 </Menu.Item>
             </>
         );
     } else {
         return (
-            <Menu.Item key={"login"}>
+            <Menu.Item key={"login"} >
                 <Button type="primary" onClick={() => { navigate('/login'); }}>Log in</Button>
             </Menu.Item>
         )
@@ -94,10 +97,21 @@ export default function NavBar({ props }) {
     const [open, setOpen] = useState(false);
     const [shoes, setShoes] = useState(undefined);
 
+    let handleSearch = (keyword) => {
+        fetch(`/api/search/${keyword}`, {
+            method: 'get', 
+            credentials: 'include',
+        })
+        .then((data) => { return data.json() })
+        .then((shoesFound) => {
+            setShoes(shoesFound);
+        })
+    }
+
     return (
         <Affix>
             <div>
-                <Menu mode="horizontal" defaultSelectedKeys={[]} style={{width: "100%"}}>
+                <Menu mode="horizontal" defaultSelectedKeys={[]} style={{width: "100%", display: 'flex'}}>
                     <Menu.Item key={"home"}>
                         <Link to={`/`}>Home</Link>
                     </Menu.Item>
@@ -117,22 +131,11 @@ export default function NavBar({ props }) {
                     </Menu.Item>
                     <Logon props={props} />
                 </Menu>
-                <Drawer title="Search" placement="right" onClose={() => {
-                    setOpen(false);
-                }} open={open}>
+                <Drawer title="Search" placement="right" onClose={() => { setOpen(false); }} open={open} >
                     <div>
                         <Search
                             placeholder="Search..."
-                            onSearch={(keyword) => {
-                                fetch(`/api/search/${keyword}`, {
-                                    method: 'get', 
-                                    credentials: 'include',
-                                })
-                                .then((data) => { return data.json() })
-                                .then((shoesFound) => {
-                                    setShoes(shoesFound);
-                                })
-                            }}
+                            onSearch={handleSearch}
                             style={{width: 325}}
                         />
                         {(shoes)? 
