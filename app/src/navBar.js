@@ -22,19 +22,27 @@ function Logon({ props }) {
     if (loggedIn) {
         return (
             <>
-                <Menu.Item key={"logout"} >
-                    <Button type="primary" onClick={handleLogout}>Log out</Button>
-                </Menu.Item>
-                <Menu.Item key={"cart"} >
-                    <Button onClick={() => { navigate('/cart'); }}>Cart</Button>
-                </Menu.Item>
+                <Menu.SubMenu key={"user"} title={`Hello, ${props.username}` } >
+                    <Menu.Item key={"logout"} >
+                        <Link style={{ color: "red" }} onClick={handleLogout}>Log out</Link>
+                    </Menu.Item>
+                    <Menu.Item key={"cart"} >
+                        <Link to={'/cart'} >Cart</Link>
+                    </Menu.Item>
+                </Menu.SubMenu>
+
             </>
         );
     } else {
         return (
-            <Menu.Item key={"login"} >
-                <Button type="primary" onClick={() => { navigate('/login'); }}>Log in</Button>
-            </Menu.Item>
+            <>
+                <Menu.Item key={"login"} >
+                    <Button type="primary" onClick={() => { navigate('/login'); }}>Log in</Button>
+                </Menu.Item>
+                <Menu.Item key={"register"} >
+                    <Button onClick={() => { navigate('/register'); }}>Register</Button>
+                </Menu.Item>
+            </>
         )
     }
 }

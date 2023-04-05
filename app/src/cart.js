@@ -247,7 +247,7 @@ export default function Cart() {
                 <Result
                     status="success"
                     title="Thank you for your purchase"
-                    subTitle={`Order number: ${checkoutNumber} . Click 'Orders' to track your order.`}
+                    subTitle={`Order number: ${checkoutNumber} . Click 'Orders' for more details.`}
                     extra={[
                     <Button type="primary" key="console" onClick={() => { navigate('/') }} >Home</Button>
                     ]}

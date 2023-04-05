@@ -77,9 +77,12 @@ function Info({ name, gender, price }) {
 function Review({ props }) {
     let { username, review } = props;
     return (
-        <Card style={{ marginTop: "16" }} title={username} >
-            {review}
-        </Card>
+        <div>
+            <Card type='inner' style={{ marginTop: "16" }} title={username} >
+                {review}
+            </Card>
+            <br/>
+        </div>
     )
 }
 
