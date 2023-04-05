@@ -1,7 +1,7 @@
 import { Menu, Button, Drawer, Input, Card, Affix } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined, LogoutOutlined, ShoppingCartOutlined, LoginOutlined, FormOutlined, OrderedListOutlined } from '@ant-design/icons';
 const { Search } = Input;
 
 function Logon({ props }) {
@@ -24,10 +24,19 @@ function Logon({ props }) {
             <>
                 <Menu.SubMenu key={"user"} title={`Hello, ${props.username}` } >
                     <Menu.Item key={"logout"} >
-                        <Link style={{ color: "red" }} onClick={handleLogout}>Log out</Link>
+                        <Link style={{ color: "red" }} onClick={handleLogout}>
+                            <LogoutOutlined /> Log out
+                        </Link>
                     </Menu.Item>
                     <Menu.Item key={"cart"} >
-                        <Link to={'/cart'} >Cart</Link>
+                        <Link to={'/cart'} >
+                            <ShoppingCartOutlined /> Cart
+                        </Link>
+                    </Menu.Item>
+                    <Menu.Item key={"order"} >
+                        <Link to={'/order'} >
+                            <OrderedListOutlined /> Order
+                        </Link>
                     </Menu.Item>
                 </Menu.SubMenu>
 
@@ -37,10 +46,14 @@ function Logon({ props }) {
         return (
             <>
                 <Menu.Item key={"login"} >
-                    <Button type="primary" onClick={() => { navigate('/login'); }}>Log in</Button>
+                    <Button type="primary" onClick={() => { navigate('/login'); }}>
+                        <LoginOutlined /> Log in
+                    </Button>
                 </Menu.Item>
                 <Menu.Item key={"register"} >
-                    <Button onClick={() => { navigate('/register'); }}>Register</Button>
+                    <Button onClick={() => { navigate('/register'); }}>
+                        <FormOutlined /> Register
+                    </Button>
                 </Menu.Item>
             </>
         )
