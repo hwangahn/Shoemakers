@@ -1,4 +1,4 @@
-import { Menu, Button, Drawer, Input, Card, Affix } from 'antd';
+import { Menu, Button, Drawer, Input, Card, Affix, Space } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { SearchOutlined, LogoutOutlined, ShoppingCartOutlined, LoginOutlined, FormOutlined, OrderedListOutlined, UserOutlined } from '@ant-design/icons';
@@ -41,12 +41,14 @@ function Logon({ props }) {
     } else {
         return (
             <Menu.Item key={"logon"} style={{ marginLeft: 'auto' }} >
-                <Button type="primary" onClick={() => { navigate('/login'); }}>
-                    <LoginOutlined /> Log in
-                </Button>
-                <Button onClick={() => { navigate('/register'); }}>
-                    <FormOutlined /> Register
-                </Button>
+                <Space>
+                    <Button type="primary" onClick={() => { navigate('/login'); }}>
+                        <LoginOutlined /> Log in
+                    </Button>
+                    <Button onClick={() => { navigate('/register'); }}>
+                        <FormOutlined /> Register
+                    </Button>
+                </Space>
             </Menu.Item>
         )
     }
