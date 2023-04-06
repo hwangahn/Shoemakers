@@ -56,7 +56,6 @@ let logoutRequest = (req, res) => {
 }
 
 let checkCredential = (req, res) => {
-    console.log(req.isAuthenticated());
     if (req.isAuthenticated()) {
         return res.status(200).json({ isLoggedIn: req.isAuthenticated(), username: req.user.username });
     } else {

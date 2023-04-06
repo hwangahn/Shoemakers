@@ -81,10 +81,9 @@ function Review({ props }) {
     let { username, review } = props;
     return (
         <div>
-            <Card type='inner' style={{ marginTop: "16" }} title={username} >
+            <Card type='inner' title={username} style={{ width: "100%" }} >
                 {review}
             </Card>
-            <br/>
         </div>
     )
 }
@@ -141,9 +140,9 @@ function ReviewForm({ credential, reviews, setReviews, sid }) {
                 </Form>
                 }   
             </Space>
-            <div style={{ width: "50%", margin: "0 auto" }} >
+            <Space direction="vertical" style={{ margin: "0 auto" }} >
                 {reviews.map((element) => { return <Review props={element} /> })}
-            </div>
+            </Space>
         </div>
     )
 }
