@@ -220,7 +220,7 @@ export default function ShoeView() {
     } else {
         return (
             <div>
-                <Spin  />
+                <Spin />
             </div>
         )
     }
