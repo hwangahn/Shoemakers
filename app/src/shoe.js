@@ -139,8 +139,6 @@ function ReviewForm({ credential, reviews, setReviews, sid }) {
                     </Form.Item>
                 </Form>
                 }   
-            </Space>
-            <Space direction="vertical" style={{ margin: "0 auto" }} >
                 {reviews.map((element) => { return <Review props={element} /> })}
             </Space>
         </div>
