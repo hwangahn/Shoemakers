@@ -1,6 +1,7 @@
 import { Button, Card, Divider, Form, Select, Space, Spin, message } from 'antd';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { ShoppingCartOutlined } from '@ant-design/icons'
 import NavBar from './navBar';
 import TextArea from 'antd/es/input/TextArea';
 
@@ -59,7 +60,9 @@ function OrderForm({ size, isLoggedIn }) {
             }}>
                 {sizes.map(element => <Select.Option value={element.iid}>{element.size}</Select.Option>)}
             </Select>
-            <Button className="addToCart" type='primary' disabled={disabled} onClick={handleAddToCart}>Add to cart</Button>
+            <Button className="addToCart" type='primary' disabled={disabled} onClick={handleAddToCart}>
+                <ShoppingCartOutlined /> Add to cart
+            </Button>
         </div>
     )
 }

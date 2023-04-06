@@ -1,7 +1,7 @@
 import { Menu, Button, Drawer, Input, Card, Affix } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { SearchOutlined, LogoutOutlined, ShoppingCartOutlined, LoginOutlined, FormOutlined, OrderedListOutlined } from '@ant-design/icons';
+import { SearchOutlined, LogoutOutlined, ShoppingCartOutlined, LoginOutlined, FormOutlined, OrderedListOutlined, UserOutlined } from '@ant-design/icons';
 const { Search } = Input;
 
 function Logon({ props }) {
@@ -22,7 +22,7 @@ function Logon({ props }) {
     if (loggedIn) {
         return (
             <>
-                <Menu.SubMenu key={"user"} title={`Hello, ${props.username}` } >
+                <Menu.SubMenu key={"user"} icon={<UserOutlined />} title={`Hello, ${props.username}`} style={{ marginLeft: 'auto' }} >
                     <Menu.Item key={"logout"} >
                         <Link style={{ color: "red" }} onClick={handleLogout}>
                             <LogoutOutlined /> Log out
@@ -45,7 +45,7 @@ function Logon({ props }) {
     } else {
         return (
             <>
-                <Menu.Item key={"login"} >
+                <Menu.Item key={"login"} style={{ marginLeft: 'auto' }} >
                     <Button type="primary" onClick={() => { navigate('/login'); }}>
                         <LoginOutlined /> Log in
                     </Button>
@@ -55,7 +55,7 @@ function Logon({ props }) {
                         <FormOutlined /> Register
                     </Button>
                 </Menu.Item>
-            </>
+            </>          
         )
     }
 }

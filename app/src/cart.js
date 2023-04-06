@@ -1,9 +1,8 @@
 import { Affix, Avatar, Badge, Button, Card, Spin, Result, message } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
+import { MinusOutlined, PlusOutlined, DeleteOutlined, CheckOutlined } from '@ant-design/icons';
 import NavBar from "./navBar";
-const ButtonGroup = Button.Group;
 
 function ShoeCard({ props, shoeList, setShoeList, buttonDisabled, setButtonDisabled }) {
     let { iid, sid, name, imageURL, gender, price, qty, size } = props;
@@ -111,13 +110,13 @@ function ShoeCard({ props, shoeList, setShoeList, buttonDisabled, setButtonDisab
                     <p>Size: {size}</p>
                     <h3>
                         Quantity:&nbsp;
-                        <Badge count={qty} />
+                        <Badge color="blue" count={qty} />
                     </h3>
-                    <ButtonGroup >
+                    <Button.Group>
                         <Button disabled={buttonDisabled} onClick={handleMinus} icon={<MinusOutlined />} />
                         <Button disabled={buttonDisabled} onClick={handlePlus} icon={<PlusOutlined />} />
-                    </ButtonGroup>
-                    <Button disabled={buttonDisabled} type="primary" onClick={handleRemove} >Remove</Button>
+                    </Button.Group>
+                    <Button disabled={buttonDisabled} type="primary" onClick={handleRemove} ><DeleteOutlined /></Button>
                 </div>
             </Card>
         </div>
@@ -174,7 +173,7 @@ function Details({ total, buttonDisabled, setButtonDisabled, setShoeList, setChe
         <Affix offsetTop={50}>
             <div style={{width: "50%", float: "right"}}>
                 <Card style={{
-                    width: 150,
+                    width: 165,
                     margin: "20px",
                     borderRadius: "20px",
                     overflow: "hidden",
@@ -182,7 +181,9 @@ function Details({ total, buttonDisabled, setButtonDisabled, setShoeList, setChe
                     <h2>Total:</h2>
                     <p>{`${total.toLocaleString('en-US')}₫`}</p>
                     <br />
-                    <Button type="primary" disabled={buttonDisabled} onClick={handleCheckout} >Checkout</Button>
+                    <Button type="primary" disabled={buttonDisabled} onClick={handleCheckout} >
+                        <CheckOutlined /> Checkout
+                    </Button>
                 </Card>
             </div>
         </Affix>
