@@ -2,7 +2,6 @@ import { Menu, Button, Drawer, Input, Card, Affix } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { SearchOutlined, LogoutOutlined, ShoppingCartOutlined, LoginOutlined, FormOutlined, OrderedListOutlined, UserOutlined } from '@ant-design/icons';
-const { Search } = Input;
 
 function Logon({ props }) {
     let navigate = useNavigate();
@@ -21,41 +20,34 @@ function Logon({ props }) {
 
     if (loggedIn) {
         return (
-            <>
-                <Menu.SubMenu key={"user"} icon={<UserOutlined />} title={`Hello, ${props.username}`} style={{ marginLeft: 'auto' }} >
-                    <Menu.Item key={"logout"} >
-                        <Link style={{ color: "red" }} onClick={handleLogout}>
-                            <LogoutOutlined /> Log out
-                        </Link>
-                    </Menu.Item>
-                    <Menu.Item key={"cart"} >
-                        <Link to={'/cart'} >
-                            <ShoppingCartOutlined /> Cart
-                        </Link>
-                    </Menu.Item>
-                    <Menu.Item key={"order"} >
-                        <Link to={'/order'} >
-                            <OrderedListOutlined /> Order
-                        </Link>
-                    </Menu.Item>
-                </Menu.SubMenu>
-
-            </>
+            <Menu.SubMenu key={"user"} selectable={false} icon={<UserOutlined />} title={`Hello, ${props.username}`} style={{ marginLeft: 'auto' }} >
+                <Menu.Item key={"logout"} >
+                    <Link style={{ color: "red" }} onClick={handleLogout}>
+                        <LogoutOutlined /> Log out
+                    </Link>
+                </Menu.Item>
+                <Menu.Item key={"cart"} >
+                    <Link to={'/cart'} >
+                        <ShoppingCartOutlined /> Cart
+                    </Link>
+                </Menu.Item>
+                <Menu.Item key={"order"} >
+                    <Link to={'/order'} >
+                        <OrderedListOutlined /> Order
+                    </Link>
+                </Menu.Item>
+            </Menu.SubMenu>
         );
     } else {
         return (
-            <>
-                <Menu.Item key={"login"} style={{ marginLeft: 'auto' }} >
-                    <Button type="primary" onClick={() => { navigate('/login'); }}>
-                        <LoginOutlined /> Log in
-                    </Button>
-                </Menu.Item>
-                <Menu.Item key={"register"} >
-                    <Button onClick={() => { navigate('/register'); }}>
-                        <FormOutlined /> Register
-                    </Button>
-                </Menu.Item>
-            </>          
+            <Menu.Item key={"logon"} style={{ marginLeft: 'auto' }} >
+                <Button type="primary" onClick={() => { navigate('/login'); }}>
+                    <LoginOutlined /> Log in
+                </Button>
+                <Button onClick={() => { navigate('/register'); }}>
+                    <FormOutlined /> Register
+                </Button>
+            </Menu.Item>
         )
     }
 }
@@ -154,11 +146,7 @@ export default function NavBar({ props }) {
                 </Menu>
                 <Drawer title="Search" placement="right" onClose={() => { setOpen(false); }} open={open} >
                     <div>
-                        <Search
-                            placeholder="Search..."
-                            onSearch={handleSearch}
-                            style={{width: 325}}
-                        />
+                        <Input.Search placeholder="Search..." onSearch={handleSearch} style={{width: 325}} />
                         {(shoes)? 
                         <ShoeRack props={shoes} setOpen={setOpen} /> :
                         <></>}

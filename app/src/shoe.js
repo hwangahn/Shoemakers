@@ -127,22 +127,10 @@ function ReviewForm({ credential, reviews, setReviews, sid }) {
 
     return (
         <div style={{ width: "100%", display: 'flex', flexDirection: 'column', justifyContent: 'center' }} >
-            <Space 
-                direction="vertical"
-                size="middle"
-                style={{ width: "50%", margin: "0 auto" }}
-            >
+            <Space direction="vertical" size="middle" style={{ width: "50%", margin: "0 auto" }} >
                 {credential.isLoggedIn &&
                 <Form>
-                    
-                    <Form.Item
-                        name="Review"
-                        rules={[
-                            {
-                                required: true,
-                            },
-                        ]}
-                    >
+                    <Form.Item name="Review" >
                         <TextArea rows={4} placeholder='Your review' showCount maxLength={150} disabled={formDisabled} onChange={(e) => { setReview(e.target.value); }} />
                     </Form.Item>
                     <Form.Item>
