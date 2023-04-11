@@ -5,8 +5,6 @@ import NavBar from './navBar';
 
 function SortAndFilter({ setSort, setRange }) {
 
-    let formatter = (value) => `${value.toLocaleString('en-US')}₫`;
-
     return (
         <div style={{ width: "20%" , float: "left" }}>
             <Space direction='vertical'  style={{ width: "100%"}} >
@@ -17,7 +15,7 @@ function SortAndFilter({ setSort, setRange }) {
                     <Select.Option value="name_desc">Sort by name descending</Select.Option>
                 </Select>
                 <Slider min={100000} max={10000000} range step={100000} defaultValue={[100000, 10000000]} 
-                    tooltip={{formatter}} 
+                    tooltip={{ formatter: (value) => `${value.toLocaleString('en-US')}₫` }} 
                     style={{ width: "70%", margin: "50px" }} 
                     marks={{ 100000: "100,000₫", 10000000: "10,000,000₫" }} 
                     onAfterChange={(value) => { setRange(value) }} 
