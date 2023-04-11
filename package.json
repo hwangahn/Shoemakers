@@ -11,5 +11,9 @@
     "pg": "^8.10.0",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.29.3"
+  },
+  "scripts": {
+    "start": "node index & cd app & react-scripts start"
   }
 }
+

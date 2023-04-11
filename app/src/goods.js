@@ -1,17 +1,28 @@
 import { Link, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Pagination, Card, Select, Spin } from 'antd';
+import { Pagination, Card, Select, Spin, Slider, Space } from 'antd';
 import NavBar from './navBar';
 
-function Sort({ setSort }) {
+function SortAndFilter({ setSort, setRange }) {
+
+    let formatter = (value) => `${value.toLocaleString('en-US')}₫`;
+
     return (
         <div style={{ width: "20%" , float: "left" }}>
-            <Select style={{width: 200}} placeholder="Sort by..." onChange={(value) => { setSort(value); }}>
-                <Select.Option value="price_asc">Sort by price ascending</Select.Option>
-                <Select.Option value="price_desc">Sort by price descending</Select.Option>
-                <Select.Option value="name_asc">Sort by name ascending</Select.Option>
-                <Select.Option value="name_desc">Sort by name descending</Select.Option>
-            </Select>
+            <Space direction='vertical'  style={{ width: "100%"}} >
+                <Select style={{ width: "70%", marginLeft: "50px" }} placeholder="Sort by..." onChange={(value) => { setSort(value); }}>
+                    <Select.Option value="price_asc">Sort by price ascending</Select.Option>
+                    <Select.Option value="price_desc">Sort by price descending</Select.Option>
+                    <Select.Option value="name_asc">Sort by name ascending</Select.Option>
+                    <Select.Option value="name_desc">Sort by name descending</Select.Option>
+                </Select>
+                <Slider min={100000} max={10000000} range step={100000} defaultValue={[100000, 10000000]} 
+                    tooltip={{formatter}} 
+                    style={{ width: "70%", margin: "50px" }} 
+                    marks={{ 100000: "100,000₫", 10000000: "10,000,000₫" }} 
+                    onAfterChange={(value) => { setRange(value) }} 
+                />
+            </Space>
         </div>
     )
 }
@@ -44,15 +55,23 @@ function ShoeCard({ props }) {
     )
 }
 
-function ShoeRack({ allShoes, sort }) {
+function ShoeRack({ allShoes, sort, range }) {
 
     let [page, setPage] = useState(1);
 
     let shoes = allShoes;
     let sortParam = sort.split('_');
+
+    let shoesInRange = shoes.filter((element) => {
+        if (parseInt(element.price) >= parseInt(range[0]) && parseInt(element.price) <= parseInt(range[1])) {
+            return element;
+        }
+    });
+
+    console.log(shoesInRange);
     
     if (sortParam[0] === "name") {
-        shoes.sort((a, b) => {
+        shoesInRange.sort((a, b) => {
             if (a.name < b.name) {
                 return ((sortParam[1] === "asc")? -1 : 1);
             } else if (a.name > b.name) {
@@ -62,7 +81,7 @@ function ShoeRack({ allShoes, sort }) {
             }
         });
     } else if (sortParam[0] === "price") {
-        shoes.sort((a, b) => {
+        shoesInRange.sort((a, b) => {
             if (parseInt(a.price) < parseInt(b.price)) {
                 return ((sortParam[1] === "asc")? -1 : 1);
             } else  if (parseInt(a.price) > parseInt(b.price)) {
@@ -73,7 +92,7 @@ function ShoeRack({ allShoes, sort }) {
         });
     }
 
-    let shoesInPage = shoes.slice((page - 1) * 3, page * 3);
+    let shoesInPage = shoesInRange.slice((page - 1) * 3, page * 3);
 
     return (
         <div className='shoe-rack' style={{ width: "80%" , float: "right" }}>
@@ -91,7 +110,7 @@ function ShoeRack({ allShoes, sort }) {
                 })}
             </div>
             <div>
-                <Paging shoe={shoes} setPage={setPage} />
+                <Paging shoe={shoesInRange} setPage={setPage} />
             </div>
         </div>
     );
@@ -101,6 +120,7 @@ function Paging({ shoe, setPage }) {
     return (
         <div>
             <Pagination
+                hideOnSinglePage
                 defaultCurrent={1}
                 pageSize={3}
                 total={shoe.length}
@@ -114,6 +134,7 @@ export default function GoodsView() {
     let [credential, setCredential] = useState();
     let [allShoes, setAllShoes] = useState();
     let [sort, setSort] = useState("None");
+    let [range, setRange] = useState([100000, 10000000]);
 
     let param = useParams();
     
@@ -134,8 +155,8 @@ export default function GoodsView() {
         return (
             <div>
                 <NavBar props={credential} />
-                <Sort setSort={setSort} />
-                <ShoeRack allShoes={allShoes} sort={sort} />
+                <SortAndFilter setSort={setSort} setRange={setRange} />
+                <ShoeRack allShoes={allShoes} sort={sort} range={range} />
             </div>
         )
     } else {
