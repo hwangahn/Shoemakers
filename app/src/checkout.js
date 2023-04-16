@@ -104,10 +104,10 @@ function OrderForm() {
                 </Select>
                 }
             </Space>
-            <Space style={{ width: "100%", paddingBottom: "50px" }}>
+            <Space style={{ width: "100%", paddingBottom: "10px", paddingLeft: "10px" }}>
                 <p>Expected arrival: {expectedArrival}</p>
             </Space>
-            <Select placeholder="Payment method" style={{ width: "620px" }}>
+            <Select placeholder="Payment method" style={{ width: "620px" }} onChange={(value) => setPaymentMethod(value)}>
                 <Select.Option value={"cod"}>Cash On Delivery</Select.Option>
                 <Select.Option value={"credit"}>Credit Card</Select.Option>
             </Select>
