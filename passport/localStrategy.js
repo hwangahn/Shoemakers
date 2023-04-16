@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const { user } = require('../models/user');
 const { Op } = require('sequelize');
 const passport = require('passport');
+require('dotenv').config();
 
 let verify = (username, password, done) => {
 
@@ -19,7 +20,7 @@ let verify = (username, password, done) => {
         }
 
         const hashedPassword = crypto.createHmac('sha256', password)
-                                    .update('very secure trust me')
+                                    .update(process.env.CRYPTO_WORD)
                                     .digest('hex');    
         if (hashedPassword === theOneUser.password) {
             return done(null, theOneUser);
@@ -53,7 +54,7 @@ let signup = async (req, username, password, done) => {
         let newUser = await user.create({
             username: username,
             password: crypto.createHmac('sha256', password)
-                            .update('very secure trust me')
+                            .update(process.env.CRYPTO_WORD)
                             .digest('hex'),
             phone: req.body.phone,
             address: req.body.address

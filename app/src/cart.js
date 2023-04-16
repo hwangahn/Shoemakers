@@ -1,4 +1,4 @@
-import { Affix, Avatar, Badge, Button, Card, Spin, Result, message } from "antd";
+import { Affix, Avatar, Badge, Button, Card, Spin, message } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MinusOutlined, PlusOutlined, DeleteOutlined, CheckOutlined } from '@ant-design/icons';
@@ -148,26 +148,9 @@ function ShoeRack({ shoeList, setShoeList, buttonDisabled, setButtonDisabled }) 
     );
 }
 
-function Details({ total, buttonDisabled, setButtonDisabled, setShoeList, setCheckoutNumber }) {
+function Details({ total, buttonDisabled }) {
 
-    let handleCheckout = () => {
-        setButtonDisabled(true);
-        fetch('api/checkout', {
-            method: 'post', 
-            credentials: 'include',
-        })
-        .then((res) => { return res.json() })
-        .then((data) => {
-            console.log(data);
-            if (data.msg == "OK") {
-                setCheckoutNumber(data.oid);
-            } else {
-                data.msg.map((element) => { message.warning(element) });
-                setShoeList(data.shoes);
-                setButtonDisabled(false);
-            }
-        })
-    }
+    let navigate = useNavigate();
 
     return (
         <Affix offsetTop={50}>
@@ -181,7 +164,7 @@ function Details({ total, buttonDisabled, setButtonDisabled, setShoeList, setChe
                     <h2>Total:</h2>
                     <p>{`${total.toLocaleString('en-US')}₫`}</p>
                     <br />
-                    <Button type="primary" disabled={buttonDisabled} onClick={handleCheckout} >
+                    <Button type="primary" disabled={buttonDisabled} onClick={() => {navigate('/checkout')}} >
                         <CheckOutlined /> Checkout
                     </Button>
                 </Card>
@@ -195,7 +178,6 @@ export default function Cart() {
     let [shoeList, setShoeList] = useState();
     let [total, setTotal] = useState(0);
     let [buttonDisabled, setButtonDisabled] = useState(false);
-    let [checkoutNumber, setCheckoutNumber] = useState();
 
     let navigate = useNavigate();
 
@@ -241,21 +223,7 @@ export default function Cart() {
         }
     }, [shoeList])
 
-    if (checkoutNumber) {
-        console.log(checkoutNumber);
-        return (
-            <div>
-                <Result
-                    status="success"
-                    title="Thank you for your purchase"
-                    subTitle={`Order number: ${checkoutNumber} . Click 'Order' for more details.`}
-                    extra={[
-                    <Button type="primary" key="console" onClick={() => { navigate('/') }} >Home</Button>
-                    ]}
-                />
-            </div>
-        )
-    } else if (credential && shoeList) {
+    if (credential && shoeList) {
         return (
             <div>
                 <NavBar props={credential}/>
@@ -268,9 +236,6 @@ export default function Cart() {
                 <Details 
                     total={total} 
                     buttonDisabled={buttonDisabled}
-                    setButtonDisabled={setButtonDisabled}
-                    setShoeList={setShoeList} 
-                    setCheckoutNumber={setCheckoutNumber}
                 />
             </div>
         )

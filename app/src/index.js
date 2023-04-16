@@ -9,6 +9,7 @@ import ShoeView from './shoe';
 import LoginView from './login';
 import RegisterView from './register';
 import Cart from './cart';
+import Checkout from './checkout';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route exact path='/login' Component={LoginView} />
           <Route exact path='/register' Component={RegisterView} />
           <Route exact path='/cart' Component={Cart} />
+          <Route exact path='/checkout' Component={Checkout} />
         </Routes>
         <FloatButton.BackTop visibilityHeight={100} />
       </BrowserRouter>

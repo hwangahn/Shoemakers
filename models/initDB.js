@@ -5,11 +5,10 @@ const { shoe } = require('./shoe');
 const { orderDetail } = require('./orderDetail');
 const { inventory } = require('./inventory');
 const { review } = require('./review');
+const { payment } = require('./payment');
+require('dotenv').config();
 
-let options = ["mysql://newuser:hoanganh.012@localhost/dev", 
-            "postgres://hoang:mGnhdfZEcn6Gv4bXVCosunza2G2eAQHs@dpg-cg70b1d269v5l67opue0-a.singapore-postgres.render.com:5432/test_ffwb?ssl=true"];
-
-const connection = new Sequelize(options[1]);
+const connection = new Sequelize(process.env.DB_KEY);
 
 connection.authenticate()
 .then(() => {
@@ -77,6 +76,12 @@ shoe.hasMany(review, {
     foreignKey: 'sid'
 });
 
+order.hasOne(payment, {
+    foreignKey: 'oid'
+});
+payment.belongsTo(order, {
+    foreignKey: 'oid'
+});
 
 user.sync()
 .then(() => {
@@ -93,6 +98,9 @@ user.sync()
 })
 .then(() => {
     return review.sync();
+})
+.then(() => {
+    return payment.sync();
 })
 .catch((err) => {
     console.log(err);

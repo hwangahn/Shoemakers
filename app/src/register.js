@@ -13,8 +13,16 @@ export default function RegisterView() {
 
     let handleRegister = (e) => {
         e.preventDefault();
+        let passwordFormat = RegExp(/^(\w*(([a-z]+[A-Z]+\d+)|([a-z]+\d+[A-Z]+)|([A-Z]+[a-z]+\d+)|([A-Z]+\d+[a-z]+)|(\d+[A-Z]+[a-z]+)|(\d+[a-z]+[A-Z]+))\w*)$/);
+        let phoneFormat = RegExp(/^0(?!0)[0-9]{9,10}$/); 
         if (password != passwordRetype) {
             message.error("Password and password retype doesn't match")
+        } else if (!passwordFormat.test(password)){
+            message.error("Password must contain at least one lowercase letter, one uppercase letter and one number and cannot contain special characters");
+        } else if (password.length < 8){
+            message.error("Password must have 8 or more characters");
+        } else if (!phoneFormat.test(phone)){
+            message.error("Please enter a valid phone number");
         } else if (username !== "" && password !== "" && phone !== "" && address !== "") {
             setDisableRegister(true);
             fetch("/api/register", {

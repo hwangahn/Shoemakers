@@ -3,39 +3,29 @@ require('dotenv').config();
 
 const connection = new Sequelize(process.env.DB_KEY);
 
-let shoe = connection.define('shoe', {
+let payment = connection.define('payment', {
 
-    sid: {
+    oid: {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true,
-        autoIncrement: true
     },
 
-    name: {
-        type: DataTypes.STRING,
+    type: {
+        type: DataTypes.TEXT,
         allowNull: false
     },
 
-    gender: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-
-    imageURL: {
-        type: DataTypes.STRING
-    },
-
-    price: {
+    amount: {
         type: DataTypes.INTEGER,
         allowNull: false
     }
 
 }, {
-    tableName: "shoe",
+    tableName: "payment",
     timestamps: false,
     createdAt: false,
     updatedAt: false
 });
 
-module.exports = { shoe };
+module.exports = { payment };

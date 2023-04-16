@@ -55,9 +55,7 @@ function OrderForm({ size, isLoggedIn }) {
     
     return (
         <div>
-            <Select style={{width: 150}} placeholder="Size" onChange={(value) => {
-                setSizePick(value);
-            }}>
+            <Select style={{width: 150}} placeholder="Size" onChange={(value) => { setSizePick(value); }}>
                 {sizes.map(element => <Select.Option value={element.iid}>{element.size}</Select.Option>)}
             </Select>
             <Button className="addToCart" type='primary' disabled={disabled} onClick={handleAddToCart}>

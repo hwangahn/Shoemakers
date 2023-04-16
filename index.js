@@ -6,9 +6,10 @@ require('./models/initDB');
 const { verify, signup } = require('./passport/localStrategy');
 const LocalStrategy = require('passport-local');
 const cors = require('cors');
+require('dotenv').config();
 
 let app = express();
-let port = 4000;
+let port = process.env.PORT;
 
 app.set('views', './tools');
 app.set('view engine', 'hbs');
@@ -27,7 +28,7 @@ app.use(express.urlencoded());
 app.use(express.text());
 app.use(express.json());
 app.use(session({
-    secret: "oh so secret",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
 }));

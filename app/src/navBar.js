@@ -140,9 +140,7 @@ export default function NavBar({ props }) {
                         <Link to={`/gender/kid`}>Kid</Link>
                     </Menu.Item>
                     <Menu.Item key={"search"} >
-                        <Button type="primary" shape="circle" icon={<SearchOutlined />} onClick={() => {
-                            setOpen(true);
-                        }} />
+                        <Button type="primary" shape="circle" icon={<SearchOutlined />} onClick={() => { setOpen(true); }} />
                     </Menu.Item>
                     <Logon props={props} />
                 </Menu>

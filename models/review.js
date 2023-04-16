@@ -1,9 +1,7 @@
 const { Sequelize, DataTypes } = require('sequelize');
+require('dotenv').config();
 
-let options = ["mysql://newuser:hoanganh.012@localhost/dev", 
-            "postgres://hoang:mGnhdfZEcn6Gv4bXVCosunza2G2eAQHs@dpg-cg70b1d269v5l67opue0-a.singapore-postgres.render.com:5432/test_ffwb?ssl=true"];
-
-const connection = new Sequelize(options[1]);
+const connection = new Sequelize(process.env.DB_KEY);
 
 let review = connection.define('review', {
 
