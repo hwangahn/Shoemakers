@@ -23,8 +23,6 @@ let payment = connection.define('payment', {
 
 }, {
     tableName: "payment",
-    timestamps: false,
-    createdAt: false,
     updatedAt: false
 });
 
