@@ -16,6 +16,21 @@ let payment = connection.define('payment', {
         allowNull: false
     },
 
+    city: {
+        type: DataTypes.TEXT,
+        allowNull: false
+    },
+
+    district: {
+        type: DataTypes.TEXT,
+        allowNull: false
+    },
+
+    ward: {
+        type: DataTypes.TEXT,
+        allowNull: false
+    },
+
     amount: {
         type: DataTypes.INTEGER,
         allowNull: false

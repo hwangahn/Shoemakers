@@ -192,6 +192,9 @@ let checkout = async (req, res) => {
 
     if (!msg.length) {
         console.log("here");
+        if (!shoes.length) {
+            return res.status(403);
+        }
         shoes.forEach( async (Element) => {
             let getInventory = await inventory.findOne({
                 where: {
