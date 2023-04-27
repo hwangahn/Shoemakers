@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import NavBar from './navBar';
 
-function OrderForm({ buttonDisabled, shoeList, setShoeList }) {
+function OrderForm({ buttonDisabled, total, shoeList, setShoeList, setOrderNumber }) {
 
     let [city, setCity] = useState();
     let [district, setDistrict] = useState();
@@ -92,7 +92,30 @@ function OrderForm({ buttonDisabled, shoeList, setShoeList }) {
 
     let checkout = () => {
         if (ward && district && city && paymentMethod) {
-
+            fetch('/api/checkout', {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                method: 'post',
+                credentials: 'include',
+                body: JSON.stringify({
+                    city: city,
+                    district: district,
+                    ward: ward,
+                    paymentMethod: paymentMethod,
+                    total: total
+                })
+            })
+            .then((res) => { return res.json() })
+            .then((data) => { 
+                console.log(data);
+                if (data.msg == 'OK') {
+                    setOrderNumber(data.oid);
+                } else {
+                    setShoeList(data.shoes);
+                    data.msg.forEach((element) => message.error(element));
+                }
+            })
         } else {
             message.warning("Please fill in all information");
         }
@@ -210,6 +233,7 @@ export default function Checkout() {
     let [shoeList, setShoeList] = useState();
     let [total, setTotal] = useState(0);
     let [buttonDisabled, setButtonDisabled] = useState(false);
+    let [orderNumber, setOrderNumber] = useState('');
 
     let navigate = useNavigate();
 
@@ -255,16 +279,35 @@ export default function Checkout() {
         }
     }, [shoeList])
 
-    if (credential && shoeList) {
+    if (credential && shoeList && orderNumber == '') {
         return (
             <div>
                 <NavBar props={credential}/>
-                <OrderForm buttonDisabled={buttonDisabled} />
+                <OrderForm 
+                    buttonDisabled={buttonDisabled}
+                    total={total}
+                    shoeList={shoeList}
+                    setShoeList={setShoeList}
+                    setOrderNumber={setOrderNumber}
+                />
                 <ShoeRack 
                     shoeList={shoeList}
                     total={total}    
                 />
             </div>
+        )
+    } else if (orderNumber != '') {
+        return (
+            <Result
+                status="success"
+                title="Your order has been accepted"
+                subTitle={`Order number: ${orderNumber}. Head over to Orders for more details`}
+                extra={[
+                <Button type="primary" key="console" onClick={navigate('/')}>
+                    Home
+                </Button>
+            ]}
+            />
         )
     } else {
         return (

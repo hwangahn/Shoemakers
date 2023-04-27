@@ -2,6 +2,7 @@ const { orderDetail } = require('../models/orderDetail');
 const { order } = require('../models/order');
 const { shoe } = require('../models/shoe');
 const { inventory } = require('../models/inventory');
+const { payment } = require('../models/payment');
 const { Op } = require('sequelize');
 
 let getOrderDetails = async (req) => {
@@ -217,6 +218,15 @@ let checkout = async (req, res) => {
         });
 
         getOrder.update({ status: "shipped" });
+
+        payment.create({
+            oid: getOrder.oid,
+            type: req.body.paymentMethod,
+            city: req.body.city,
+            district: req.body.district,
+            ward: req.body.ward,
+            amount: req.body.total
+        });
 
         res.status(200).json({ oid: getOrder.oid, msg: "OK" });
     } else {
