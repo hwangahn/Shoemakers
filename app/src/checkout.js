@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import NavBar from './navBar';
 
-function OrderForm({ buttonDisabled, total, shoeList, setShoeList, setOrderNumber }) {
+function OrderForm({ buttonDisabled, total, setShoeList, setOrderNumber }) {
 
     let [city, setCity] = useState();
     let [district, setDistrict] = useState();
@@ -286,7 +286,6 @@ export default function Checkout() {
                 <OrderForm 
                     buttonDisabled={buttonDisabled}
                     total={total}
-                    shoeList={shoeList}
                     setShoeList={setShoeList}
                     setOrderNumber={setOrderNumber}
                 />
@@ -303,10 +302,8 @@ export default function Checkout() {
                 title="Your order has been accepted"
                 subTitle={`Order number: ${orderNumber}. Head over to Orders for more details`}
                 extra={[
-                <Button type="primary" key="console" onClick={navigate('/')}>
-                    Home
-                </Button>
-            ]}
+                    <Button type="primary" onClick={() => { navigate('/') }}>Home</Button>
+                ]}
             />
         )
     } else {
